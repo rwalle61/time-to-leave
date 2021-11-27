@@ -1,0 +1,65 @@
+{
+  "name": "time-to-leave",
+  "author": "rwalle61",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc --pretty --noEmit",
+    "format": "prettier --write .",
+    "lint": "yarn type-check && eslint . --ext ts --ext tsx --ext js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test-all": "yarn lint && yarn test",
+    "deploy": "yarn sls"
+  },
+  "lint-staged": {
+    "*.@(ts|tsx)": [
+      "yarn lint",
+      "yarn format"
+    ]
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@testing-library/dom": "^8.11.1",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/react-hooks": "^7.0.2",
+    "@testing-library/user-event": "^13.0.6",
+    "@types/jest": "^27.0.3",
+    "@types/node": "^16.11.10",
+    "@types/react": "^17.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "autoprefixer": "^10.2.5",
+    "babel-jest": "^27.3.1",
+    "dotenv": "^10.0.0",
+    "eslint": "^8.3.0",
+    "eslint-config-airbnb-typescript": "^16.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-tailwind": "^0.2.1",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.3.1",
+    "jest-extended": "^1.1.0",
+    "jest-watch-typeahead": "^1.0.0",
+    "lint-staged": "^12.1.2",
+    "postcss": "^8.2.9",
+    "prettier": "^2.0.2",
+    "serverless": "^2.30.3",
+    "tailwindcss": "^2.0.4",
+    "typescript": "^4.5.2"
+  }
+}
