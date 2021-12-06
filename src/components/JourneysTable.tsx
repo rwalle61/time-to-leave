@@ -1,28 +1,17 @@
 import React from 'react';
 import { Journey } from '../pages';
 
-const savings = (journeys: Journey[]) =>
-  journeys.map(
-    ({ timeSavedComparedToNextJourney }) => timeSavedComparedToNextJourney
-  );
+const toMinutes = (seconds: number) => Math.round(seconds / 60);
 
-const maxSaving = (journeys: Journey[]) => Math.max(...savings(journeys));
-
-const minSaving = (journeys: Journey[]) => Math.min(...savings(journeys));
-
-const range = (journeys: Journey[]) =>
-  maxSaving(journeys) - minSaving(journeys);
-
-const normalise = (
-  timeSavedComparedToNextJourney: number,
-  journeys: Journey[]
-) => {
-  const almostNormalisedSaving =
-    (timeSavedComparedToNextJourney + Math.abs(minSaving(journeys))) /
-    range(journeys);
-  const normalisedSaving =
-    almostNormalisedSaving === 0 ? 0.1 : almostNormalisedSaving;
-  return normalisedSaving;
+const getBackgroundColour = (timeSavedComparedToNextJourney: number) => {
+  const minutesSaved = toMinutes(timeSavedComparedToNextJourney);
+  if (minutesSaved > 10) {
+    return 'bg-green-300';
+  }
+  if (minutesSaved < -10) {
+    return 'bg-red-200';
+  }
+  return 'bg-white';
 };
 
 type TableProps = {
@@ -60,16 +49,14 @@ const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
               }) => (
                 <tr
                   key={departureTime}
-                  className={`text-gray-${
-                    Math.round(
-                      normalise(timeSavedComparedToNextJourney, journeys) * 10
-                    ) * 100
-                  } text-center uppercase text-xs font-semibold tracking-wider bg-white border-b-2 border-gray-200`}
+                  className={`text-gray-600 text-center uppercase text-xs font-semibold tracking-wider ${getBackgroundColour(
+                    timeSavedComparedToNextJourney
+                  )} border-b-2 border-gray-200`}
                 >
                   <th className="w-1/4 px-2 py-3 ">{departureTime}</th>
                   <th className="w-1/4 px-2 py-3 ">{duration?.text}</th>
                   <th className="w-1/4 px-2 py-3 ">
-                    {`${Math.round(timeSavedComparedToNextJourney / 60)} mins`}
+                    {`${toMinutes(timeSavedComparedToNextJourney)} mins`}
                   </th>
                   <th className="w-1/4 px-2 py-3 ">{rank}</th>
                 </tr>
