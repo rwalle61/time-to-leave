@@ -34,21 +34,21 @@ export const extractJourneyInfo = (
       return {
         ...journeyInfo,
         // TODO handle when "duration" doesn't exist
-        savingComparedToNextJourney: NaN,
+        timeSavedComparedToNextJourney: NaN,
       };
     }
-    const savingComparedToNextJourney =
+    const timeSavedComparedToNextJourney =
       nextJourney.duration.value - journeyInfo.duration.value;
     return {
       ...journeyInfo,
-      savingComparedToNextJourney,
+      timeSavedComparedToNextJourney,
     };
   });
 
   const journeysSortedByRank = [...journeysWithDeltas].sort(
     (journeyA, journeyB) =>
-      journeyB.savingComparedToNextJourney -
-      journeyA.savingComparedToNextJourney
+      journeyB.timeSavedComparedToNextJourney -
+      journeyA.timeSavedComparedToNextJourney
   );
 
   const journeysWithRanks = journeysWithDeltas.map((journey) => {

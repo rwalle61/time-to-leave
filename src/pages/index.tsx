@@ -17,7 +17,7 @@ const HOME_ADDRESS = '27 Lancaster Grove, NW3 4EX';
 export type Journey = {
   departureTime: string;
   duration: google.maps.Duration | undefined;
-  savingComparedToNextJourney: number;
+  timeSavedComparedToNextJourney: number;
   rank: number;
 };
 

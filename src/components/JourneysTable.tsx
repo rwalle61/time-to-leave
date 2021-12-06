@@ -3,7 +3,7 @@ import { Journey } from '../pages';
 
 const savings = (journeys: Journey[]) =>
   journeys.map(
-    ({ savingComparedToNextJourney }) => savingComparedToNextJourney
+    ({ timeSavedComparedToNextJourney }) => timeSavedComparedToNextJourney
   );
 
 const maxSaving = (journeys: Journey[]) => Math.max(...savings(journeys));
@@ -14,11 +14,11 @@ const range = (journeys: Journey[]) =>
   maxSaving(journeys) - minSaving(journeys);
 
 const normalise = (
-  savingComparedToNextJourney: number,
+  timeSavedComparedToNextJourney: number,
   journeys: Journey[]
 ) => {
   const almostNormalisedSaving =
-    (savingComparedToNextJourney + Math.abs(minSaving(journeys))) /
+    (timeSavedComparedToNextJourney + Math.abs(minSaving(journeys))) /
     range(journeys);
   const normalisedSaving =
     almostNormalisedSaving === 0 ? 0.1 : almostNormalisedSaving;
@@ -55,21 +55,21 @@ const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
               ({
                 departureTime,
                 duration,
-                savingComparedToNextJourney,
+                timeSavedComparedToNextJourney,
                 rank,
               }) => (
                 <tr
                   key={departureTime}
                   className={`text-gray-${
                     Math.round(
-                      normalise(savingComparedToNextJourney, journeys) * 10
+                      normalise(timeSavedComparedToNextJourney, journeys) * 10
                     ) * 100
                   } text-center uppercase text-xs font-semibold tracking-wider bg-white border-b-2 border-gray-200`}
                 >
                   <th className="w-1/4 px-2 py-3 ">{departureTime}</th>
                   <th className="w-1/4 px-2 py-3 ">{duration?.text}</th>
                   <th className="w-1/4 px-2 py-3 ">
-                    {savingComparedToNextJourney}
+                    {`${Math.round(timeSavedComparedToNextJourney / 60)} mins`}
                   </th>
                   <th className="w-1/4 px-2 py-3 ">{rank}</th>
                 </tr>
