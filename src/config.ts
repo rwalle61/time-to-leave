@@ -1,7 +1,5 @@
 /* eslint-disable no-console */
-/* eslint-disable prefer-destructuring */
-// Don't destructure process.env because: https://github.com/vercel/next.js/pull/20869/files
-export const GOOGLE_DIRECTIONS_API_KEY = process.env.GOOGLE_DIRECTIONS_API_KEY;
+export const RESTRICTED_API_KEY = 'AIzaSyBd3kPyYX2adZJK8y_Ml4fNHhWzFsc3VN0';
 
 // `yarn dev` sets NODE_ENV to 'development'
 // `yarn test` sets NODE_ENV to 'test'

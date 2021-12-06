@@ -1,10 +1,18 @@
 import React from 'react';
-import { render, screen } from '../testUtils';
 import { Home } from '../../src/pages/index';
+import { render, screen } from '../testUtils';
 
 describe('Home page', () => {
-  it('shows the title', () => {
+  it('loads the page without blowing up', () => {
     render(<Home />);
-    expect(screen.getByText('Next.js!')).toBeInTheDocument();
+
+    expect(screen.getByText('From:')).toBeInTheDocument();
+    expect(screen.getByText('To:')).toBeInTheDocument();
+    expect(screen.getByText('Best time to leave:')).toBeInTheDocument();
+
+    expect(screen.getByText('Leave at')).toBeInTheDocument();
+    expect(screen.getByText('Duration')).toBeInTheDocument();
+    expect(screen.getByText('Time Saved')).toBeInTheDocument();
+    expect(screen.getByText('Rank')).toBeInTheDocument();
   });
 });

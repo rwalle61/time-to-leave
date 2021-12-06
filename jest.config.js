@@ -13,9 +13,13 @@ module.exports = {
   ],
   moduleNameMapper: {
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
-    '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
+    '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.ts',
   },
   setupFiles: ['./test/setup-env.ts'],
-  setupFilesAfterEnv: ['jest-extended', './test/mock-next-link.tsx'],
+  setupFilesAfterEnv: [
+    'jest-extended',
+    './test/mock-next-link.tsx',
+    './test/mock-next-image.tsx',
+  ],
   resetMocks: true,
 };

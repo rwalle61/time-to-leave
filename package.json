@@ -24,6 +24,7 @@
     "node": ">=12"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.12.10",
     "next": "latest",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
@@ -35,6 +36,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/react-hooks": "^7.0.2",
     "@testing-library/user-event": "^13.0.6",
+    "@types/google.maps": "^3.47.0",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.10",
     "@types/react": "^17.0.1",
