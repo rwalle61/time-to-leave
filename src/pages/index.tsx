@@ -36,6 +36,8 @@ export const Home = (): JSX.Element => {
 
   const [destination, setDestination] = useState(HOME_ADDRESS);
 
+  const [error, setError] = useState<Error | undefined>();
+
   useEffect(() => {
     if (!IS_PROD_ENV) {
       return;
@@ -61,11 +63,19 @@ export const Home = (): JSX.Element => {
   });
 
   const fetchAndUpdateJourneys = async () => {
-    const journeysInfo = await fetchJourneys(origin, destination);
+    try {
+      const journeysInfo = await fetchJourneys(origin, destination);
 
-    logger.log('journeysInfo', journeysInfo);
+      logger.log('journeysInfo', journeysInfo);
 
-    setJourneys(journeysInfo);
+      setJourneys(journeysInfo);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err);
+        return;
+      }
+      throw err;
+    }
   };
 
   return (
@@ -99,6 +109,12 @@ export const Home = (): JSX.Element => {
         >
           Check
         </button>
+        {error && (
+          <div className="italic text-red-700">
+            <p>{`Oops, I don't know where that is, please try a different place`}</p>
+            <p className="text-xs">{`(${error})`}</p>
+          </div>
+        )}
       </div>
       {Boolean(journeys.length) && <JourneysTable journeys={journeys} />}
     </div>
