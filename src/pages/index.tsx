@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { Header } from '../components/Header';
 import JourneysTable from '../components/JourneysTable';
 import { PageHead } from '../components/PageHead';
-import { IS_PROD_ENV, RESTRICTED_API_KEY } from '../config';
-import { extractJourneyInfo } from '../services/extractJourneyInfo';
+import {
+  IS_PROD_ENV,
+  reallyCallGoogleAPI,
+  RESTRICTED_API_KEY,
+} from '../config';
 import logger from '../services/logger';
-import mockGoogleResponses from '../services/mockGoogleResponses';
+import { fetchJourneys } from '../services/fetchJourneys';
 
 const loader = new Loader({
   apiKey: RESTRICTED_API_KEY,
@@ -21,20 +24,14 @@ export type Journey = {
   rank: number;
 };
 
-type Location = google.maps.DirectionsRequest['origin'];
-
-const reallyCallGoogleAPI = IS_PROD_ENV;
+export type Location = google.maps.DirectionsRequest['origin'];
 
 export const Home = (): JSX.Element => {
   const [loadedGoogleMapsSdk, setLoadedGoogleMapsSdk] = useState(false);
 
   const [journeys, setJourneys] = useState<Journey[]>([]);
 
-  const [bestTimeToLeave, setBestTimeToLeave] = useState<string>('Unsure');
-
-  const [origin, setOrigin] = useState<Location | undefined>(
-    'Brixton Underground Station'
-  );
+  const [origin, setOrigin] = useState<Location>('Brixton Underground Station');
 
   const [destination] = useState(HOME_ADDRESS);
 
@@ -62,71 +59,13 @@ export const Home = (): JSX.Element => {
     load();
   });
 
-  useEffect(() => {
-    if (!origin || (reallyCallGoogleAPI && !loadedGoogleMapsSdk)) {
-      return;
-    }
+  const fetchAndUpdateJourneys = async () => {
+    const journeysInfo = await fetchJourneys(origin, destination);
 
-    const getGoogleResponses = async () => {
-      const directionsService = new google.maps.DirectionsService();
+    logger.log('journeysInfo', journeysInfo);
 
-      const travelMode = google.maps.TravelMode.TRANSIT;
-
-      const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;
-
-      const now = Date.now();
-
-      const departureTimes = [
-        new Date(now + 0 * MILLISECONDS_PER_HOUR),
-        new Date(now + 1 * MILLISECONDS_PER_HOUR),
-        new Date(now + 2 * MILLISECONDS_PER_HOUR),
-        new Date(now + 3 * MILLISECONDS_PER_HOUR),
-        new Date(now + 4 * MILLISECONDS_PER_HOUR),
-        new Date(now + 5 * MILLISECONDS_PER_HOUR),
-        new Date(now + 6 * MILLISECONDS_PER_HOUR),
-        new Date(now + 7 * MILLISECONDS_PER_HOUR),
-        new Date(now + 8 * MILLISECONDS_PER_HOUR),
-      ];
-
-      const responses = await Promise.all(
-        departureTimes.map(async (departureTime) => {
-          const request: google.maps.DirectionsRequest = {
-            origin,
-            destination,
-            travelMode,
-            drivingOptions: {
-              departureTime,
-            },
-            transitOptions: {
-              departureTime,
-            },
-          };
-          const response = await directionsService.route(request);
-          return response;
-        })
-      );
-      return responses;
-    };
-
-    const fetchAndUpdateJourneys = async () => {
-      const responses = reallyCallGoogleAPI
-        ? await getGoogleResponses()
-        : mockGoogleResponses;
-
-      const journeysInfo = extractJourneyInfo(responses);
-
-      logger.log('journeysInfo', journeysInfo);
-
-      const [bestJourney] = [...journeysInfo].sort(
-        (journeyA, journeyB) => journeyA.rank - journeyB.rank
-      );
-
-      setBestTimeToLeave(bestJourney.departureTime);
-
-      setJourneys(journeysInfo);
-    };
-    fetchAndUpdateJourneys();
-  }, [loadedGoogleMapsSdk, origin]);
+    setJourneys(journeysInfo);
+  };
 
   return (
     <div>
@@ -140,11 +79,15 @@ export const Home = (): JSX.Element => {
         <p>
           To: <b>{destination}</b>
         </p>
-        <h2>
-          Best time to leave: <b>{bestTimeToLeave}</b>
-        </h2>
+        <button
+          type="button"
+          className="inline-flex px-2 py-2 bg-blue-300 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
+          onClick={() => fetchAndUpdateJourneys()}
+          disabled={!loadedGoogleMapsSdk}
+        >
+          Check
+        </button>
       </div>
-      {!journeys.length && <p>Loading...</p>}
       {Boolean(journeys.length) && <JourneysTable journeys={journeys} />}
     </div>
   );
