@@ -1,6 +1,7 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useEffect, useState } from 'react';
 import { Header } from '../components/Header';
+import { Input } from '../components/Input';
 import JourneysTable from '../components/JourneysTable';
 import { PageHead } from '../components/PageHead';
 import {
@@ -8,8 +9,8 @@ import {
   reallyCallGoogleAPI,
   RESTRICTED_API_KEY,
 } from '../config';
-import logger from '../services/logger';
 import { fetchJourneys } from '../services/fetchJourneys';
+import logger from '../services/logger';
 
 const loader = new Loader({
   apiKey: RESTRICTED_API_KEY,
@@ -33,7 +34,7 @@ export const Home = (): JSX.Element => {
 
   const [origin, setOrigin] = useState<Location>('Brixton Underground Station');
 
-  const [destination] = useState(HOME_ADDRESS);
+  const [destination, setDestination] = useState(HOME_ADDRESS);
 
   useEffect(() => {
     if (!IS_PROD_ENV) {
@@ -74,10 +75,21 @@ export const Home = (): JSX.Element => {
       <div className="container px-2 py-2 mx-auto text-lg text-center">
         <p>
           From:{' '}
-          <b>{typeof origin === 'string' ? origin : JSON.stringify(origin)}</b>
+          <Input
+            value={typeof origin === 'string' ? origin : JSON.stringify(origin)}
+            onChange={(event) => {
+              setOrigin(event.target.value);
+            }}
+          />
         </p>
         <p>
-          To: <b>{destination}</b>
+          To:{' '}
+          <Input
+            value={destination}
+            onChange={(event) => {
+              setDestination(event.target.value);
+            }}
+          />
         </p>
         <button
           type="button"
