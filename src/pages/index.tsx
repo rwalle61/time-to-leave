@@ -69,6 +69,7 @@ export const Home = (): JSX.Element => {
 
       setJourneys(journeysInfo);
     } catch (err) {
+      console.error(err);
       if (err instanceof Error) {
         setError(err);
         return;
