@@ -1,9 +1,14 @@
-import mockGoogleResponses from './mockGoogleResponses';
+import Journey from '../domain/Journey';
+
+const getTransitLines = ({ steps }: google.maps.DirectionsLeg) =>
+  steps
+    .filter(({ transit }) => transit)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    .map(({ transit }) => transit!.line.short_name);
 
 export const extractJourneyInfo = (
-  responses: google.maps.DirectionsResult[] | typeof mockGoogleResponses
-) => {
-  // console.log('[extractJourneyInfo.ts] responses', responses);
+  responses: google.maps.DirectionsResult[]
+): Journey[] => {
   const journeys = responses.map((response) => {
     // "A route with no waypoints will contain exactly one DirectionsLeg"
     const recommendedJourney = response.routes[0].legs[0];
@@ -20,9 +25,10 @@ export const extractJourneyInfo = (
       minute: '2-digit',
     });
 
-    const journey = {
+    const journey: Omit<Journey, 'timeSavedComparedToNextJourney'> = {
       departureTime: departureTimeString,
       duration: journeyDuration,
+      transitLines: getTransitLines(recommendedJourney),
       // TODO
       // `warnings[]` contains an array of warnings to be displayed when showing these directions. If you do not use the provided DirectionsRenderer object, you must handle and display these warnings yourself.
       // `fare` contains the total fare (that is, the total ticket costs) on this route. This property is only returned for transit requests and only for routes where fare information is available for all transit legs

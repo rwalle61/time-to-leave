@@ -11,18 +11,13 @@ import {
 } from '../config';
 import { fetchJourneys } from '../services/fetchJourneys';
 import logger from '../services/logger';
+import Journey from '../domain/Journey';
 
 const loader = new Loader({
   apiKey: RESTRICTED_API_KEY,
 });
 
 const HOME_ADDRESS = '27 Lancaster Grove, NW3 4EX';
-
-export type Journey = {
-  departureTime: string;
-  duration: google.maps.Duration | undefined;
-  timeSavedComparedToNextJourney: number;
-};
 
 export type Location = google.maps.DirectionsRequest['origin'];
 
