@@ -4,13 +4,14 @@ export const extractJourneyInfo = (
   responses: google.maps.DirectionsResult[] | typeof mockGoogleResponses
 ) => {
   const journeys = responses.map((response) => {
-    const recommendedRoute = response.routes[0];
-
     // "A route with no waypoints will contain exactly one DirectionsLeg"
-    const journeyDuration = recommendedRoute.legs[0].duration;
+    const recommendedJourney = response.routes[0].legs[0];
+
+    const journeyDuration = recommendedJourney.duration;
 
     const departureTime = new Date(
-      (response as any).request.transitOptions.departureTime
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      recommendedJourney.departure_time!.value
     );
     const departureTimeString = departureTime.toLocaleDateString('en-GB', {
       weekday: 'short',
