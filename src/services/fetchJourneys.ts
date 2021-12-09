@@ -71,7 +71,7 @@ export const fetchJourneys = async (
 
   const responses = reallyCallGoogleAPI
     ? await getGoogleResponses(origin, destination, departureTimes)
-    : mockGoogleResponses;
+    : (mockGoogleResponses as unknown as google.maps.DirectionsResult[]);
 
   return extractJourneyInfo(responses);
 };
