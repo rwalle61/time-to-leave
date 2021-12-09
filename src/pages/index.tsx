@@ -22,7 +22,6 @@ export type Journey = {
   departureTime: string;
   duration: google.maps.Duration | undefined;
   timeSavedComparedToNextJourney: number;
-  rank: number;
 };
 
 export type Location = google.maps.DirectionsRequest['origin'];

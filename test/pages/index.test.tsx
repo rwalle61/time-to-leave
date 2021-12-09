@@ -12,6 +12,5 @@ describe('Home page', () => {
     expect(screen.getByText('Leave at')).toBeInTheDocument();
     expect(screen.getByText('Duration')).toBeInTheDocument();
     expect(screen.getByText('Time Saved')).toBeInTheDocument();
-    expect(screen.getByText('Rank')).toBeInTheDocument();
   });
 });

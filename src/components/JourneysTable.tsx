@@ -34,19 +34,11 @@ const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
               <th className="w-1/4 px-2 py-3 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase bg-gray-100 border-b-2 border-gray-200">
                 Time Saved
               </th>
-              <th className="w-1/4 px-2 py-3 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase bg-gray-100 border-b-2 border-gray-200">
-                Rank
-              </th>
             </tr>
           </thead>
           <tbody>
             {journeys.map(
-              ({
-                departureTime,
-                duration,
-                timeSavedComparedToNextJourney,
-                rank,
-              }) => (
+              ({ departureTime, duration, timeSavedComparedToNextJourney }) => (
                 <tr
                   key={departureTime}
                   className={`text-gray-600 text-center uppercase text-xs font-semibold tracking-wider ${getBackgroundColour(
@@ -58,7 +50,6 @@ const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
                   <th className="w-1/4 px-2 py-3 ">
                     {`${toMinutes(timeSavedComparedToNextJourney)} mins`}
                   </th>
-                  <th className="w-1/4 px-2 py-3 ">{rank}</th>
                 </tr>
               )
             )}

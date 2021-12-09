@@ -3,6 +3,7 @@ import mockGoogleResponses from './mockGoogleResponses';
 export const extractJourneyInfo = (
   responses: google.maps.DirectionsResult[] | typeof mockGoogleResponses
 ) => {
+  // console.log('[extractJourneyInfo.ts] responses', responses);
   const journeys = responses.map((response) => {
     // "A route with no waypoints will contain exactly one DirectionsLeg"
     const recommendedJourney = response.routes[0].legs[0];
@@ -54,21 +55,5 @@ export const extractJourneyInfo = (
     };
   });
 
-  const journeysSortedByRank = [...journeysWithDeltas].sort(
-    (journeyA, journeyB) =>
-      journeyB.timeSavedComparedToNextJourney -
-      journeyA.timeSavedComparedToNextJourney
-  );
-
-  const journeysWithRanks = journeysWithDeltas.map((journey) => {
-    const rank = journeysSortedByRank.findIndex(
-      ({ departureTime }) => departureTime === journey.departureTime
-    );
-    return {
-      ...journey,
-      rank: rank + 1,
-    };
-  });
-
-  return journeysWithRanks;
+  return journeysWithDeltas;
 };
