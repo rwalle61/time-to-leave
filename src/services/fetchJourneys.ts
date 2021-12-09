@@ -8,12 +8,10 @@ const getDepartureTimes = () => {
 
   const MILLISECONDS_PER_DAY = MILLISECONDS_PER_HOUR * 24;
 
-  const ELEVEN_PM = 23;
-
   const isPast6AM = new Date().getHours() > 5;
 
   const firstDepartureDate = new Date();
-  firstDepartureDate.setHours(ELEVEN_PM);
+  firstDepartureDate.setHours(22);
   firstDepartureDate.setMinutes(0);
   firstDepartureDate.setSeconds(0);
   firstDepartureDate.setMilliseconds(0);
