@@ -4,11 +4,7 @@ import { Header } from '../components/Header';
 import { Input } from '../components/Input';
 import JourneysTable from '../components/JourneysTable';
 import { PageHead } from '../components/PageHead';
-import {
-  IS_PROD_ENV,
-  reallyCallGoogleAPI,
-  RESTRICTED_API_KEY,
-} from '../config';
+import { reallyCallGoogleAPI, RESTRICTED_API_KEY } from '../config';
 import { fetchJourneys } from '../services/fetchJourneys';
 import logger from '../services/logger';
 import Journey from '../domain/Journey';
@@ -32,19 +28,15 @@ export const Home = (): JSX.Element => {
 
   const [error, setError] = useState<Error | undefined>();
 
-  useEffect(() => {
-    if (!IS_PROD_ENV) {
-      return;
-    }
+  const setOriginToCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition((geolocationPosition) => {
-      console.log('[index.tsx] geolocationPosition', geolocationPosition);
       const position: google.maps.LatLngLiteral = {
         lat: geolocationPosition.coords.latitude,
         lng: geolocationPosition.coords.longitude,
       };
       setOrigin(position);
     });
-  }, []);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -96,14 +88,23 @@ export const Home = (): JSX.Element => {
             }}
           />
         </p>
-        <button
-          type="button"
-          className="inline-flex px-2 py-2 bg-blue-300 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
-          onClick={() => fetchAndUpdateJourneys()}
-          disabled={!loadedGoogleMapsSdk}
-        >
-          Check
-        </button>
+        <div className="space-x-1">
+          <button
+            type="button"
+            className="inline-flex px-2 py-2 bg-blue-300 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
+            onClick={() => setOriginToCurrentLocation()}
+          >
+            Use current location
+          </button>
+          <button
+            type="button"
+            className="inline-flex px-2 py-2 bg-blue-300 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
+            onClick={() => fetchAndUpdateJourneys()}
+            disabled={!loadedGoogleMapsSdk}
+          >
+            Check
+          </button>
+        </div>
         {error && (
           <div className="italic text-red-700">
             <p>{`Oops, I don't know where that is, please try a different place`}</p>
