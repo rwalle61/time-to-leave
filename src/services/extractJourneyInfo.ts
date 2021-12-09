@@ -29,8 +29,16 @@ export const extractJourneyInfo = (
     return journey;
   });
 
-  const journeysWithDeltas = journeys.map((journeyInfo, i) => {
-    const nextJourney = journeys[i === journeys.length - 1 ? i : i + 1];
+  const uniqueJourneys = journeys.filter(
+    (journey, index) =>
+      journeys.findIndex(
+        ({ departureTime }) => departureTime === journey.departureTime
+      ) === index
+  );
+
+  const journeysWithDeltas = uniqueJourneys.map((journeyInfo, i) => {
+    const nextJourney =
+      uniqueJourneys[i === uniqueJourneys.length - 1 ? i : i + 1];
     if (!journeyInfo.duration || !nextJourney.duration) {
       return {
         ...journeyInfo,
