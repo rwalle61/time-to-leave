@@ -4,7 +4,7 @@ const getTransitLines = ({ steps }: google.maps.DirectionsLeg) =>
   steps
     .filter(({ transit }) => transit)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    .map(({ transit }) => transit!.line.short_name);
+    .map(({ transit }) => transit!.line.short_name || transit!.line.name);
 
 export const extractJourneyInfo = (
   responses: google.maps.DirectionsResult[]
