@@ -202,7 +202,7 @@ export const Home = (): JSX.Element => {
         </div>
         {error && (
           <div className="italic text-red-700">
-            <p>{`Oops, I don't know where that is, please try a different place`}</p>
+            <p>{`You found a bug! 🥳. Please refresh`}</p>
             <p className="text-xs text-left">{`(${error.message}: ${error.stack})`}</p>
           </div>
         )}
