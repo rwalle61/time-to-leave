@@ -8,9 +8,5 @@ describe('Home page', () => {
 
     expect(screen.getByText('From:')).toBeInTheDocument();
     expect(screen.getByText('To:')).toBeInTheDocument();
-
-    expect(screen.getByText('Leave at')).toBeInTheDocument();
-    expect(screen.getByText('Duration')).toBeInTheDocument();
-    expect(screen.getByText('Time Saved')).toBeInTheDocument();
   });
 });
