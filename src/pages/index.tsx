@@ -1,4 +1,5 @@
 import { Loader } from '@googlemaps/js-api-loader';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import JourneysTable from '../components/JourneysTable';
@@ -142,6 +143,11 @@ export const Home = (): JSX.Element => {
     setupPlaceChangedListener(InputIds.Destination, setDestination);
   }, [loadedGoogleMapsSdk]);
 
+  const COMMA = '%2C';
+
+  // Format: // https://citymapper.com/directions?startcoord=<lat>,<lon>&startname=<name>&startaddress=<address>&endcoord=<lat>,<lon>&endname=<name>&endaddress=<address>
+  const linkToCityMapper = `https://citymapper.com/directions?startcoord=${origin.latLng?.lat}${COMMA}${origin.latLng?.lng}&endcoord=${destination.latLng?.lat}${COMMA}${destination.latLng?.lng}`;
+
   return (
     <div>
       <PageHead />
@@ -169,22 +175,30 @@ export const Home = (): JSX.Element => {
             className="italic"
           />
         </p>
-        <div className="space-x-1">
+        <div className="space-x-1 space-y-1">
           <button
             type="button"
-            className="inline-flex px-2 py-2 bg-blue-300 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
+            className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
             onClick={() => setOriginToCurrentLocation()}
           >
             Use current location
           </button>
           <button
             type="button"
-            className="inline-flex px-2 py-2 bg-blue-300 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
+            className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
             onClick={() => fetchAndUpdateJourneys()}
             disabled={!loadedGoogleMapsSdk}
           >
             Check
           </button>
+          <Link href={linkToCityMapper}>
+            <button
+              type="button"
+              className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
+            >
+              See on CityMapper
+            </button>
+          </Link>
         </div>
         {error && (
           <div className="italic text-red-700">
