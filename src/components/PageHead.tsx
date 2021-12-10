@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React from 'react';
 
-export const PageHead = () => (
+const PageHead = () => (
   <Head>
     <title>Time to Leave</title>
     <link rel="icon" href="/favicon.ico" />
@@ -11,3 +11,5 @@ export const PageHead = () => (
     <link rel="manifest" href="/site.webmanifest" />
   </Head>
 );
+
+export default PageHead;

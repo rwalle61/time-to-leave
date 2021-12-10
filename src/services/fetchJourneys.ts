@@ -1,6 +1,5 @@
 import { extractJourneyInfo } from './extractJourneyInfo';
 import mockGoogleResponses from './mockGoogleResponses';
-import { Location } from '../pages/index';
 import { reallyCallGoogleAPI } from '../config';
 
 const getDepartureTimes = () => {
@@ -35,8 +34,8 @@ const getDepartureTimes = () => {
 };
 
 const getGoogleResponses = async (
-  origin: Location,
-  destination: Location,
+  originLatLng: google.maps.LatLngLiteral,
+  destinationLatLng: google.maps.LatLngLiteral,
   departureTimes: Date[]
 ) => {
   const directionsService = new google.maps.DirectionsService();
@@ -46,8 +45,8 @@ const getGoogleResponses = async (
   const responses = await Promise.all(
     departureTimes.map(async (departureTime) => {
       const request: google.maps.DirectionsRequest = {
-        origin,
-        destination,
+        origin: originLatLng,
+        destination: destinationLatLng,
         travelMode,
         drivingOptions: {
           departureTime,
@@ -64,13 +63,13 @@ const getGoogleResponses = async (
 };
 
 export const fetchJourneys = async (
-  origin: Location,
-  destination: Location
+  originLatLng: google.maps.LatLngLiteral,
+  destinationLatLng: google.maps.LatLngLiteral
 ) => {
   const departureTimes = getDepartureTimes();
 
   const responses = reallyCallGoogleAPI
-    ? await getGoogleResponses(origin, destination, departureTimes)
+    ? await getGoogleResponses(originLatLng, destinationLatLng, departureTimes)
     : (mockGoogleResponses as unknown as google.maps.DirectionsResult[]);
 
   return extractJourneyInfo(responses);

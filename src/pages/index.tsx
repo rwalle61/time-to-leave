@@ -1,48 +1,50 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useEffect, useState } from 'react';
-import { Header } from '../components/Header';
-import { Input } from '../components/Input';
+import Header from '../components/Header';
 import JourneysTable from '../components/JourneysTable';
-import { PageHead } from '../components/PageHead';
-import { reallyCallGoogleAPI, RESTRICTED_API_KEY } from '../config';
+import PageHead from '../components/PageHead';
+import { RESTRICTED_API_KEY } from '../config';
+import { BRIXTON_STATION, HOME } from '../domain/defaultLocations';
+import Journey from '../domain/Journey';
+import Location from '../domain/Location';
 import { fetchJourneys } from '../services/fetchJourneys';
 import logger from '../services/logger';
-import Journey from '../domain/Journey';
 
-const loader = new Loader({
-  apiKey: RESTRICTED_API_KEY,
-});
-
-const HOME_ADDRESS = '27 Lancaster Grove, NW3 4EX';
-
-export type Location = google.maps.DirectionsRequest['origin'];
+enum InputIds {
+  Origin = 'origin-input',
+  Destination = 'destination-input',
+}
 
 export const Home = (): JSX.Element => {
   const [loadedGoogleMapsSdk, setLoadedGoogleMapsSdk] = useState(false);
 
   const [journeys, setJourneys] = useState<Journey[]>([]);
 
-  const [origin, setOrigin] = useState<Location>('Brixton Underground Station');
+  const [origin, setOrigin] = useState<Location>(BRIXTON_STATION);
 
-  const [destination, setDestination] = useState(HOME_ADDRESS);
+  const [destination, setDestination] = useState<Location>(HOME);
+
+  const [autocompletedPlace, setAutocompletedPlace] = useState(false);
 
   const [error, setError] = useState<Error | undefined>();
 
   const setOriginToCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition((geolocationPosition) => {
-      const position: google.maps.LatLngLiteral = {
+      const latLng: google.maps.LatLngLiteral = {
         lat: geolocationPosition.coords.latitude,
         lng: geolocationPosition.coords.longitude,
       };
-      setOrigin(position);
+      setOrigin({ name: 'Here', latLng });
     });
   };
 
   useEffect(() => {
     const load = async () => {
-      if (reallyCallGoogleAPI) {
-        await loader.load();
-      }
+      const loader = new Loader({
+        apiKey: RESTRICTED_API_KEY,
+        libraries: ['places'],
+      });
+      await loader.load();
       setLoadedGoogleMapsSdk(true);
     };
     load();
@@ -50,11 +52,21 @@ export const Home = (): JSX.Element => {
 
   const fetchAndUpdateJourneys = async () => {
     try {
-      const journeysInfo = await fetchJourneys(origin, destination);
+      if (!origin.latLng || !destination.latLng) {
+        throw new Error(
+          `Missing latLng: origin.latLng=${JSON.stringify(
+            origin.latLng
+          )}, destination.latLng=${JSON.stringify(destination.latLng)}`
+        );
+      }
+      const newJourneys = await fetchJourneys(
+        origin.latLng,
+        destination.latLng
+      );
 
-      logger.log('journeysInfo', journeysInfo);
+      logger.log('newJourneys', newJourneys);
 
-      setJourneys(journeysInfo);
+      setJourneys(newJourneys);
     } catch (err) {
       console.error(err);
       if (err instanceof Error) {
@@ -65,6 +77,71 @@ export const Home = (): JSX.Element => {
     }
   };
 
+  useEffect(() => {
+    if (!autocompletedPlace) {
+      return;
+    }
+    const fetchAndUpdateJourneysAfterAutocompletedPlace = async () => {
+      await fetchAndUpdateJourneys();
+      setAutocompletedPlace(false);
+    };
+    fetchAndUpdateJourneysAfterAutocompletedPlace();
+  }, [autocompletedPlace]);
+
+  const setupPlaceChangedListener = (
+    inputElementId: InputIds,
+    setPlace: typeof setOrigin | typeof setDestination
+  ) => {
+    const input = document.getElementById(inputElementId);
+    if (!input) {
+      throw new Error(`Input element not found. Id: ${inputElementId}`);
+    }
+    const autocomplete = new google.maps.places.Autocomplete(
+      input as HTMLInputElement
+    );
+
+    logger.log('autocomplete', autocomplete);
+
+    if (
+      (
+        autocomplete as typeof autocomplete & {
+          __e3_?: { place_changed: unknown };
+        }
+      ).__e3_?.place_changed
+    ) {
+      return;
+    }
+
+    type PlaceResultField = 'geometry' | 'name';
+
+    type Place = Required<
+      Pick<google.maps.places.PlaceResult, PlaceResultField>
+    >;
+
+    autocomplete.setFields(['geometry', 'name'] as PlaceResultField[]);
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace() as Place;
+
+      logger.log('place', place);
+
+      setPlace({
+        name: place.name,
+        latLng: place.geometry.location?.toJSON(),
+      });
+      setAutocompletedPlace(true);
+    });
+  };
+
+  useEffect(() => {
+    if (!loadedGoogleMapsSdk) {
+      return;
+    }
+    setupPlaceChangedListener(InputIds.Origin, setOrigin);
+
+    setupPlaceChangedListener(InputIds.Destination, setDestination);
+  }, [loadedGoogleMapsSdk]);
+
   return (
     <div>
       <PageHead />
@@ -72,20 +149,24 @@ export const Home = (): JSX.Element => {
       <div className="container px-2 py-2 mx-auto text-lg text-center">
         <p>
           From:{' '}
-          <Input
-            value={typeof origin === 'string' ? origin : JSON.stringify(origin)}
+          <input
+            id={InputIds.Origin}
+            value={origin.name}
             onChange={(event) => {
-              setOrigin(event.target.value);
+              setOrigin({ name: event.target.value });
             }}
+            className="italic"
           />
         </p>
         <p>
           To:{' '}
-          <Input
-            value={destination}
+          <input
+            id={InputIds.Destination}
+            value={destination.name}
             onChange={(event) => {
-              setDestination(event.target.value);
+              setDestination({ name: event.target.value });
             }}
+            className="italic"
           />
         </p>
         <div className="space-x-1">
