@@ -1,9 +1,8 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
+import { useErrorHandler } from 'react-error-boundary';
 import JourneysTable from '../components/JourneysTable';
-import PageHead from '../components/PageHead';
 import { RESTRICTED_API_KEY } from '../config';
 import {
   BRIXTON_STATION,
@@ -31,7 +30,7 @@ export const Home = (): JSX.Element => {
 
   const [destination, setDestination] = useState<Location>(HOME);
 
-  const [error, setError] = useState<Error | undefined>();
+  const handleError = useErrorHandler();
 
   const setOriginToCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition((geolocationPosition) => {
@@ -49,7 +48,11 @@ export const Home = (): JSX.Element => {
         apiKey: RESTRICTED_API_KEY,
         libraries: ['places'],
       });
-      await loader.load();
+      try {
+        await loader.load();
+      } catch (error) {
+        handleError(error);
+      }
       setLoadedGoogleMapsSdk(true);
     };
     load();
@@ -65,13 +68,8 @@ export const Home = (): JSX.Element => {
       logger.log('newJourneys', newJourneys);
 
       setJourneys(newJourneys);
-    } catch (err) {
-      console.error(err);
-      if (err instanceof Error) {
-        setError(err);
-        return;
-      }
-      throw err;
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -138,15 +136,17 @@ export const Home = (): JSX.Element => {
     if (!loadedGoogleMapsSdk) {
       return;
     }
-    setupPlaceChangedListener(InputIds.Origin, setOrigin);
+    try {
+      setupPlaceChangedListener(InputIds.Origin, setOrigin);
 
-    setupPlaceChangedListener(InputIds.Destination, setDestination);
+      setupPlaceChangedListener(InputIds.Destination, setDestination);
+    } catch (error) {
+      handleError(error);
+    }
   }, [loadedGoogleMapsSdk]);
 
   return (
     <div>
-      <PageHead />
-      <Header />
       <div className="container px-2 py-2 mx-auto text-lg text-center">
         <p>
           From:{' '}
@@ -181,12 +181,6 @@ export const Home = (): JSX.Element => {
             </button>
           </Link>
         </div>
-        {error && (
-          <div className="italic text-red-700">
-            <p>{`You found a bug! 🥳. Please refresh`}</p>
-            <p className="text-xs text-left">{`(${error.message}: ${error.stack})`}</p>
-          </div>
-        )}
       </div>
       {Boolean(journeys.length) && <JourneysTable journeys={journeys} />}
     </div>
