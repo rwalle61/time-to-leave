@@ -31,8 +31,6 @@ export const Home = (): JSX.Element => {
 
   const [destination, setDestination] = useState<Location>(HOME);
 
-  const [autocompletedPlace, setAutocompletedPlace] = useState(false);
-
   const [error, setError] = useState<Error | undefined>();
 
   const setOriginToCurrentLocation = () => {
@@ -57,19 +55,12 @@ export const Home = (): JSX.Element => {
     load();
   });
 
-  const fetchAndUpdateJourneys = async () => {
+  const updateJourneys = async (
+    originLatLng: google.maps.LatLngLiteral,
+    destinationLatLng: google.maps.LatLngLiteral
+  ) => {
     try {
-      if (!origin.latLng || !destination.latLng) {
-        throw new Error(
-          `Missing latLng: origin.latLng=${JSON.stringify(
-            origin.latLng
-          )}, destination.latLng=${JSON.stringify(destination.latLng)}`
-        );
-      }
-      const newJourneys = await fetchJourneys(
-        origin.latLng,
-        destination.latLng
-      );
+      const newJourneys = await fetchJourneys(originLatLng, destinationLatLng);
 
       logger.log('newJourneys', newJourneys);
 
@@ -85,15 +76,11 @@ export const Home = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (!autocompletedPlace) {
+    if (!loadedGoogleMapsSdk || !origin.latLng || !destination.latLng) {
       return;
     }
-    const fetchAndUpdateJourneysAfterAutocompletedPlace = async () => {
-      await fetchAndUpdateJourneys();
-      setAutocompletedPlace(false);
-    };
-    fetchAndUpdateJourneysAfterAutocompletedPlace();
-  }, [autocompletedPlace]);
+    updateJourneys(origin.latLng, destination.latLng);
+  }, [loadedGoogleMapsSdk, origin, destination]);
 
   const setupPlaceChangedListener = (
     inputElementId: InputIds,
@@ -144,7 +131,6 @@ export const Home = (): JSX.Element => {
       logger.log('newPlace', newPlace);
 
       setPlace(newPlace);
-      setAutocompletedPlace(true);
     });
   };
 
@@ -166,10 +152,7 @@ export const Home = (): JSX.Element => {
           From:{' '}
           <input
             id={InputIds.Origin}
-            value={origin.name}
-            onChange={(event) => {
-              setOrigin({ name: event.target.value });
-            }}
+            defaultValue={origin.name}
             className="italic"
           />
         </p>
@@ -177,10 +160,7 @@ export const Home = (): JSX.Element => {
           To:{' '}
           <input
             id={InputIds.Destination}
-            value={destination.name}
-            onChange={(event) => {
-              setDestination({ name: event.target.value });
-            }}
+            defaultValue={destination.name}
             className="italic"
           />
         </p>
@@ -191,14 +171,6 @@ export const Home = (): JSX.Element => {
             onClick={() => setOriginToCurrentLocation()}
           >
             Use current location
-          </button>
-          <button
-            type="button"
-            className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
-            onClick={() => fetchAndUpdateJourneys()}
-            disabled={!loadedGoogleMapsSdk}
-          >
-            Check
           </button>
           <Link href={getCityMapperLink(origin, destination)}>
             <button
