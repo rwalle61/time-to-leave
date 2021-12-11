@@ -146,41 +146,39 @@ export const Home = (): JSX.Element => {
   }, [loadedGoogleMapsSdk]);
 
   return (
-    <div>
-      <div className="container px-2 py-2 mx-auto text-lg text-center">
-        <p>
-          From:{' '}
-          <input
-            id={InputIds.Origin}
-            defaultValue={origin.name}
-            className="italic"
-          />
-        </p>
-        <p>
-          To:{' '}
-          <input
-            id={InputIds.Destination}
-            defaultValue={destination.name}
-            className="italic"
-          />
-        </p>
-        <div className="space-x-1 space-y-1">
+    <div className="container px-2 py-2 mx-auto text-lg text-center">
+      <p>
+        From:{' '}
+        <input
+          id={InputIds.Origin}
+          defaultValue={origin.name}
+          className="italic"
+        />
+      </p>
+      <p>
+        To:{' '}
+        <input
+          id={InputIds.Destination}
+          defaultValue={destination.name}
+          className="italic"
+        />
+      </p>
+      <div className="space-x-1 space-y-1">
+        <button
+          type="button"
+          className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
+          onClick={() => setOriginToCurrentLocation()}
+        >
+          Use current location
+        </button>
+        <Link href={getCityMapperLink(origin, destination)}>
           <button
             type="button"
             className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
-            onClick={() => setOriginToCurrentLocation()}
           >
-            Use current location
+            See on CityMapper
           </button>
-          <Link href={getCityMapperLink(origin, destination)}>
-            <button
-              type="button"
-              className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
-            >
-              See on CityMapper
-            </button>
-          </Link>
-        </div>
+        </Link>
       </div>
       {Boolean(journeys.length) && <JourneysTable journeys={journeys} />}
     </div>
