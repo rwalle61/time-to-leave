@@ -98,8 +98,14 @@ export const Home = (): JSX.Element => {
     if (!input) {
       throw new Error(`Input element not found. Id: ${inputElementId}`);
     }
+
+    const placeResultFields: ['geometry', 'name'] = ['geometry', 'name'];
+
     const autocomplete = new google.maps.places.Autocomplete(
-      input as HTMLInputElement
+      input as HTMLInputElement,
+      {
+        fields: placeResultFields,
+      }
     );
 
     logger.log('autocomplete', autocomplete);
@@ -114,15 +120,11 @@ export const Home = (): JSX.Element => {
       return;
     }
 
-    type PlaceResultField = 'geometry' | 'name';
-
-    type Place = Required<
-      Pick<google.maps.places.PlaceResult, PlaceResultField>
-    >;
-
-    autocomplete.setFields(['geometry', 'name'] as PlaceResultField[]);
-
     autocomplete.addListener('place_changed', () => {
+      type Place = Required<
+        Pick<google.maps.places.PlaceResult, typeof placeResultFields[number]>
+      >;
+
       const place = autocomplete.getPlace() as Place;
 
       const newPlace = {
