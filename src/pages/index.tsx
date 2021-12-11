@@ -5,7 +5,12 @@ import Header from '../components/Header';
 import JourneysTable from '../components/JourneysTable';
 import PageHead from '../components/PageHead';
 import { RESTRICTED_API_KEY } from '../config';
-import { BRIXTON_STATION, HOME } from '../domain/defaultLocations';
+import {
+  BRIXTON_STATION,
+  COLCHESTER_LAT_LNG,
+  HOME,
+  TAUNTON_LAT_LNG,
+} from '../domain/defaultLocations';
 import Journey from '../domain/Journey';
 import Location from '../domain/Location';
 import { fetchJourneys } from '../services/fetchJourneys';
@@ -104,6 +109,10 @@ export const Home = (): JSX.Element => {
     const autocomplete = new google.maps.places.Autocomplete(
       input as HTMLInputElement,
       {
+        bounds: new google.maps.LatLngBounds(
+          TAUNTON_LAT_LNG,
+          COLCHESTER_LAT_LNG
+        ),
         fields: placeResultFields,
       }
     );

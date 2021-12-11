@@ -23,3 +23,13 @@ export const WINCHESTER_TRAIN_STATION: Location = {
     lng: -1.3197025,
   },
 };
+
+export const TAUNTON_LAT_LNG: google.maps.LatLngLiteral = {
+  lat: 51.0214619,
+  lng: -3.1174915,
+};
+
+export const COLCHESTER_LAT_LNG: google.maps.LatLngLiteral = {
+  lat: 51.8861673,
+  lng: 0.8685421,
+};
