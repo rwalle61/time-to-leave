@@ -125,12 +125,14 @@ export const Home = (): JSX.Element => {
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace() as Place;
 
-      logger.log('place', place);
-
-      setPlace({
+      const newPlace = {
         name: place.name,
         latLng: place.geometry.location?.toJSON(),
-      });
+      };
+
+      logger.log('newPlace', newPlace);
+
+      setPlace(newPlace);
       setAutocompletedPlace(true);
     });
   };
