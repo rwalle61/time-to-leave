@@ -9,6 +9,7 @@ import { BRIXTON_STATION, HOME } from '../domain/defaultLocations';
 import Journey from '../domain/Journey';
 import Location from '../domain/Location';
 import { fetchJourneys } from '../services/fetchJourneys';
+import getCityMapperLink from '../services/getCityMapperLink';
 import logger from '../services/logger';
 
 enum InputIds {
@@ -143,11 +144,6 @@ export const Home = (): JSX.Element => {
     setupPlaceChangedListener(InputIds.Destination, setDestination);
   }, [loadedGoogleMapsSdk]);
 
-  const COMMA = '%2C';
-
-  // Format: // https://citymapper.com/directions?startcoord=<lat>,<lon>&startname=<name>&startaddress=<address>&endcoord=<lat>,<lon>&endname=<name>&endaddress=<address>
-  const linkToCityMapper = `https://citymapper.com/directions?startcoord=${origin.latLng?.lat}${COMMA}${origin.latLng?.lng}&endcoord=${destination.latLng?.lat}${COMMA}${destination.latLng?.lng}`;
-
   return (
     <div>
       <PageHead />
@@ -191,7 +187,7 @@ export const Home = (): JSX.Element => {
           >
             Check
           </button>
-          <Link href={linkToCityMapper}>
+          <Link href={getCityMapperLink(origin, destination)}>
             <button
               type="button"
               className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
