@@ -14,6 +14,7 @@ const Providers = ({ children }: { children: React.ReactElement }) => children;
 //   </ThemeProvider>
 // )
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const customRender = (ui: any, options = {}): unknown =>
   render(ui, { wrapper: Providers, ...options });
 

@@ -5,13 +5,17 @@ import AppHead from '../components/AppHead';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
 
+// eslint-disable-next-line react/function-component-definition, prefer-arrow/prefer-arrow-functions
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <AppHead />
       <Header />
       <ErrorBoundary>
-        <Component {...pageProps} />
+        <Component
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...pageProps}
+        />
       </ErrorBoundary>
     </>
   );

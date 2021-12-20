@@ -145,6 +145,7 @@ describe('fetchJourneys', () => {
           async (originLatLng, destinationLatLng, searchTime) => ({
             departureTime: searchTime,
             duration:
+              // eslint-disable-next-line no-nested-ternary
               searchTime < goodDepartureTime1
                 ? shortDuration1
                 : searchTime < goodDepartureTime2
@@ -249,7 +250,9 @@ describe('fetchJourneys', () => {
     it("doesn't make duplicate journey requests (i.e. it doesn't search in wait times we've already identified)", async () => {
       const journeys = await fetchJourneys(BRIXTON_STATION.latLng, HOME.latLng);
 
-      expect(getJourneyModule.getJourney).toBeCalledTimes(journeys.length);
+      expect(getJourneyModule.getJourney).toHaveBeenCalledTimes(
+        journeys.length
+      );
     });
   });
 });

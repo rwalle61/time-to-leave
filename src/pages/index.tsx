@@ -58,27 +58,26 @@ export const Home = (): JSX.Element => {
     load();
   });
 
-  const updateJourneys = async (
-    originLatLng: google.maps.LatLngLiteral,
-    destinationLatLng: google.maps.LatLngLiteral
-  ) => {
-    try {
-      const newJourneys = await fetchJourneys(originLatLng, destinationLatLng);
-
-      logger.log('newJourneys', newJourneys);
-
-      setJourneys(newJourneys);
-    } catch (error) {
-      handleError(error);
-    }
-  };
-
   useEffect(() => {
     if (!loadedGoogleMapsSdk || !origin.latLng || !destination.latLng) {
       return;
     }
-    updateJourneys(origin.latLng, destination.latLng);
-  }, [loadedGoogleMapsSdk, origin, destination]);
+    const updateJourneys = async (): Promise<void> => {
+      try {
+        const newJourneys = await fetchJourneys(
+          origin.latLng,
+          destination.latLng
+        );
+
+        logger.log('newJourneys', newJourneys);
+
+        setJourneys(newJourneys);
+      } catch (error) {
+        handleError(error);
+      }
+    };
+    updateJourneys();
+  }, [loadedGoogleMapsSdk, origin, destination, handleError]);
 
   const setupPlaceChangedListener = (
     inputElementId: InputIds,
@@ -105,6 +104,7 @@ export const Home = (): JSX.Element => {
     logger.log('autocomplete', autocomplete);
 
     if (
+      // eslint-disable-next-line no-underscore-dangle
       (
         autocomplete as typeof autocomplete & {
           __e3_?: { place_changed: unknown };
@@ -144,7 +144,7 @@ export const Home = (): JSX.Element => {
     } catch (error) {
       handleError(error);
     }
-  }, [loadedGoogleMapsSdk]);
+  }, [handleError, loadedGoogleMapsSdk]);
 
   return (
     <div className="container px-2 py-2 mx-auto text-lg text-center">
@@ -172,7 +172,7 @@ export const Home = (): JSX.Element => {
         >
           Use current location
         </button>
-        <Link href={getCityMapperLink(origin, destination)}>
+        <Link href={getCityMapperLink(origin, destination)} passHref>
           <button
             type="button"
             className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
