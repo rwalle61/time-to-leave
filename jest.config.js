@@ -17,7 +17,7 @@ module.exports = {
   },
   setupFiles: ['./test/setup-env.ts'],
   setupFilesAfterEnv: [
-    'jest-extended',
+    'jest-extended/all',
     './test/mock-next-link.tsx',
     './test/mock-next-image.tsx',
   ],

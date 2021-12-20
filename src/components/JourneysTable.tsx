@@ -1,18 +1,27 @@
 import React from 'react';
 import Journey from '../domain/Journey';
+import { MILLISECONDS_PER_MINUTE } from '../services/time.utils';
 
-const toMinutes = (seconds: number) => Math.round(seconds / 60);
-
-const getBackgroundColour = (timeSavedComparedToNextJourney: number) => {
-  const minutesSaved = toMinutes(timeSavedComparedToNextJourney);
-  if (minutesSaved > 10) {
+const getBackgroundColour = (minutesSavedComparedToNextJourney: number) => {
+  if (minutesSavedComparedToNextJourney > 10) {
     return 'bg-green-300';
   }
-  if (minutesSaved < -10) {
+  if (minutesSavedComparedToNextJourney < -10) {
     return 'bg-red-200';
   }
   return 'bg-white';
 };
+
+const journeysWithDeltas = (journeys: Journey[]) =>
+  journeys.map((journeyInfo, i) => {
+    const nextJourney = journeys[i === journeys.length - 1 ? i : i + 1];
+    const minutesSavedComparedToNextJourney =
+      (nextJourney.duration - journeyInfo.duration) / MILLISECONDS_PER_MINUTE;
+    return {
+      ...journeyInfo,
+      minutesSavedComparedToNextJourney,
+    };
+  });
 
 type TableProps = {
   journeys: Journey[];
@@ -39,23 +48,31 @@ const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
           </tr>
         </thead>
         <tbody>
-          {journeys.map(
+          {journeysWithDeltas(journeys).map(
             ({
               departureTime,
               duration,
-              timeSavedComparedToNextJourney,
+              minutesSavedComparedToNextJourney,
               transitLines,
             }) => (
               <tr
-                key={departureTime}
+                key={departureTime.getTime()}
                 className={`text-gray-600 text-center uppercase text-xs font-semibold tracking-wider ${getBackgroundColour(
-                  timeSavedComparedToNextJourney
+                  minutesSavedComparedToNextJourney
                 )} border-b-2 border-gray-200`}
               >
-                <th className="w-1/4 px-2 py-3 ">{departureTime}</th>
-                <th className="w-1/4 px-2 py-3 ">{duration?.text}</th>
                 <th className="w-1/4 px-2 py-3 ">
-                  {`${toMinutes(timeSavedComparedToNextJourney)} mins`}
+                  {departureTime.toLocaleDateString('en-GB', {
+                    weekday: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </th>
+                <th className="w-1/4 px-2 py-3 ">
+                  {Math.round(duration / 60_000)} mins
+                </th>
+                <th className="w-1/4 px-2 py-3 ">
+                  {Math.round(minutesSavedComparedToNextJourney)} mins
                 </th>
                 <th className="w-1/4 px-2 py-3 ">{transitLines.join(', ')}</th>
               </tr>

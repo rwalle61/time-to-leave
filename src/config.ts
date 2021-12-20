@@ -13,4 +13,4 @@ export const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 // console.log('[config.ts] process.env.NODE_ENV', process.env.NODE_ENV, '\n');
 // console.log('[config.ts] IS_PROD_ENV', IS_PROD_ENV, '\n');
 
-export const reallyCallGoogleAPI = IS_PROD_ENV;
+export const reallyCallGoogleAPI = (): boolean => IS_PROD_ENV;

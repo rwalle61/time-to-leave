@@ -1,76 +1,180 @@
-import { extractJourneyInfo } from './extractJourneyInfo';
-import mockGoogleResponses from './mockGoogleResponses';
 import { reallyCallGoogleAPI } from '../config';
+import Journey from '../domain/Journey';
+import { getJourney } from './getJourney';
+import logger from './logger';
+import mockJourneysFromBrixtonToHome from './mockJourneys';
+import {
+  isSameTime,
+  MILLISECONDS_PER_DAY,
+  MILLISECONDS_PER_MINUTE,
+  minutesToMilliseconds,
+} from './time.utils';
 
-const getDepartureTimes = () => {
-  const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;
+// Lower this to get nearer the best journey, at the expense of more search requests to Google
+// London tubes run every few minutes, so 6 minutes should be close enough
+export const minimumSearchPeriod = minutesToMilliseconds(6);
 
-  const MILLISECONDS_PER_DAY = MILLISECONDS_PER_HOUR * 24;
+export const expectedDurationDeviance = minutesToMilliseconds(10);
 
-  const isPast6AM = new Date().getHours() > 6;
+const isSimilarDuration = (duration1: number, duration2: number) =>
+  Math.abs(duration1 - duration2) <= expectedDurationDeviance;
 
-  const firstDepartureDate = new Date();
-  firstDepartureDate.setHours(22);
-  firstDepartureDate.setMinutes(0);
-  firstDepartureDate.setSeconds(0);
-  firstDepartureDate.setMilliseconds(0);
+const millisecondsToMinutes = (milliseconds: number): number =>
+  Math.round(milliseconds / MILLISECONDS_PER_MINUTE);
 
-  const firstDepartureTime = isPast6AM
-    ? Number(firstDepartureDate)
-    : Number(firstDepartureDate) - MILLISECONDS_PER_DAY;
+const isPast6AM = () => new Date().getHours() > 6;
 
-  const departureTimes = [
-    new Date(Number(firstDepartureTime) + 0 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 0.5 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 1 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 1.5 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 2 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 2.5 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 3 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 3.5 * MILLISECONDS_PER_HOUR),
-    new Date(Number(firstDepartureTime) + 4 * MILLISECONDS_PER_HOUR),
-  ];
-  return departureTimes;
+export const getEarliestSearchTime = (): Date => {
+  const date = isPast6AM()
+    ? new Date()
+    : new Date(Date.now() - MILLISECONDS_PER_DAY);
+  date.setHours(22);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+
+  return date;
 };
 
-const getGoogleResponses = async (
+export const getLatestSearchTime = (): Date => {
+  const date = isPast6AM()
+    ? new Date(Date.now() + MILLISECONDS_PER_DAY)
+    : new Date();
+  date.setHours(4);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+
+  return date;
+};
+
+export const findJourneys = async (
   originLatLng: google.maps.LatLngLiteral,
   destinationLatLng: google.maps.LatLngLiteral,
-  departureTimes: Date[]
-) => {
-  const directionsService = new google.maps.DirectionsService();
-
-  const travelMode = google.maps.TravelMode.TRANSIT;
-
-  const responses = await Promise.all(
-    departureTimes.map(async (departureTime) => {
-      const request: google.maps.DirectionsRequest = {
-        origin: originLatLng,
-        destination: destinationLatLng,
-        travelMode,
-        drivingOptions: {
-          departureTime,
-        },
-        transitOptions: {
-          departureTime,
-        },
-      };
-      const response = await directionsService.route(request);
-      return response;
-    })
+  earliestSearchTime: Date,
+  earliestJourneyDuration: number,
+  latestSearchTime: Date,
+  latestJourneyDuration: number
+): Promise<Journey[]> => {
+  const searchPeriod =
+    latestSearchTime.getTime() - earliestSearchTime.getTime();
+  const midpoint = new Date(earliestSearchTime.getTime() + searchPeriod / 2);
+  logger.log(
+    `earliestSearchTime: ${earliestSearchTime.toLocaleTimeString()}`,
+    `latestSearchTime: ${latestSearchTime.toLocaleTimeString()}`,
+    `midpoint: ${midpoint.toLocaleTimeString()}`,
+    `searchPeriod: ${millisecondsToMinutes(searchPeriod)} mins`
   );
-  return responses;
+
+  if (latestSearchTime < earliestSearchTime) {
+    logger.warn(
+      `earliestSearchTime (${earliestSearchTime.toLocaleTimeString()})`,
+      'is later than',
+      `latestSearchTime (${latestSearchTime.toLocaleTimeString()})`
+    );
+    return [];
+  }
+  if (searchPeriod < minimumSearchPeriod) {
+    return [];
+  }
+
+  const journeyAfterMidpoint = await getJourney(
+    originLatLng,
+    destinationLatLng,
+    midpoint
+  );
+
+  logger.log(
+    `earliestJourneyDuration: ${millisecondsToMinutes(
+      earliestJourneyDuration
+    )} mins`,
+    `latestJourneyDuration: ${millisecondsToMinutes(
+      latestJourneyDuration
+    )} mins`,
+    `journeyAfterMidpoint.duration: ${millisecondsToMinutes(
+      journeyAfterMidpoint.duration
+    )} mins`,
+    `journeyAfterMidpoint.departureTime: ${journeyAfterMidpoint.departureTime.toLocaleTimeString()}`
+  );
+  const findJourneysBeforeMidpoint = () =>
+    findJourneys(
+      originLatLng,
+      destinationLatLng,
+      earliestSearchTime,
+      earliestJourneyDuration,
+      midpoint,
+      journeyAfterMidpoint.duration
+    );
+  const findJourneysAfterMidpoint = () =>
+    findJourneys(
+      originLatLng,
+      destinationLatLng,
+      // There are no journeys between the midpoint and the departure time of the journey directly after the midpoint.
+      journeyAfterMidpoint.departureTime,
+      journeyAfterMidpoint.duration,
+      latestSearchTime,
+      latestJourneyDuration
+    );
+
+  if (
+    isSimilarDuration(earliestJourneyDuration, journeyAfterMidpoint.duration)
+  ) {
+    return [journeyAfterMidpoint, ...(await findJourneysAfterMidpoint())];
+  }
+  if (isSimilarDuration(latestJourneyDuration, journeyAfterMidpoint.duration)) {
+    return [...(await findJourneysBeforeMidpoint()), journeyAfterMidpoint];
+  }
+
+  return [
+    ...(await findJourneysBeforeMidpoint()),
+    journeyAfterMidpoint,
+    ...(await findJourneysAfterMidpoint()),
+  ];
+};
+
+export const fetchJourneysFromGoogle = async (
+  originLatLng: google.maps.LatLngLiteral,
+  destinationLatLng: google.maps.LatLngLiteral
+): Promise<Journey[]> => {
+  const earliestSearchTime = getEarliestSearchTime();
+  const latestSearchTime = getLatestSearchTime();
+
+  const [firstJourney, lastJourney] = await Promise.all([
+    getJourney(originLatLng, destinationLatLng, earliestSearchTime),
+    getJourney(originLatLng, destinationLatLng, latestSearchTime),
+  ]);
+
+  const journeys = [
+    firstJourney,
+    ...(await findJourneys(
+      originLatLng,
+      destinationLatLng,
+      firstJourney.departureTime,
+      firstJourney.duration,
+      // There are no journeys between the latestSearchTime and the departure time of the journey directly after the latestSearchTime.
+      latestSearchTime,
+      lastJourney.duration
+    )),
+    lastJourney,
+  ];
+
+  return journeys;
 };
 
 export const fetchJourneys = async (
   originLatLng: google.maps.LatLngLiteral,
   destinationLatLng: google.maps.LatLngLiteral
-) => {
-  const departureTimes = getDepartureTimes();
+): Promise<Journey[]> => {
+  const journeys = reallyCallGoogleAPI()
+    ? await fetchJourneysFromGoogle(originLatLng, destinationLatLng)
+    : mockJourneysFromBrixtonToHome;
 
-  const responses = reallyCallGoogleAPI
-    ? await getGoogleResponses(originLatLng, destinationLatLng, departureTimes)
-    : (mockGoogleResponses as unknown as google.maps.DirectionsResult[]);
+  const uniqueJourneys = journeys.filter(
+    (journey, index) =>
+      journeys.findIndex(({ departureTime }) =>
+        isSameTime(departureTime, journey.departureTime)
+      ) === index
+  );
 
-  return extractJourneyInfo(responses);
+  return uniqueJourneys;
 };

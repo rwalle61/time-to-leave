@@ -1,7 +1,6 @@
 type Journey = {
-  departureTime: string;
-  duration: google.maps.Duration | undefined;
-  timeSavedComparedToNextJourney: number;
+  departureTime: Date;
+  duration: number;
   transitLines: string[];
 };
 

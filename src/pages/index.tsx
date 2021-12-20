@@ -123,7 +123,8 @@ export const Home = (): JSX.Element => {
 
       const newPlace = {
         name: place.name,
-        latLng: place.geometry.location?.toJSON(),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        latLng: place.geometry.location!.toJSON(),
       };
 
       logger.log('newPlace', newPlace);
