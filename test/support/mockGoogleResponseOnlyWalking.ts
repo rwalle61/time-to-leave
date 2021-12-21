@@ -1,3 +1,5 @@
+import { irrelevantRouteWarnings } from '../../src/services/getJourney';
+
 const mockGoogleResponseOnlyWalking: google.maps.DirectionsResult = {
   geocoded_waypoints: [
     {
@@ -95,9 +97,7 @@ const mockGoogleResponseOnlyWalking: google.maps.DirectionsResult = {
       ],
       overview_polyline: 'erryHbe`@@I',
       summary: 'Lancaster Grove',
-      warnings: [
-        'Walking directions are in beta. Use caution – This route may be missing sidewalks or pedestrian paths.',
-      ],
+      warnings: irrelevantRouteWarnings,
       waypoint_order: [],
       overview_path: [{} as google.maps.LatLng, {} as google.maps.LatLng],
     } as google.maps.DirectionsRoute,

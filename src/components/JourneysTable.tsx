@@ -1,6 +1,8 @@
 import React from 'react';
+import 'reactjs-popup/dist/index.css';
 import Journey from '../domain/Journey';
 import { MILLISECONDS_PER_MINUTE } from '../services/time.utils';
+import WarningTooltip from './WarningTooltip';
 
 const getBackgroundColour = (minutesSavedComparedToNextJourney: number) => {
   if (minutesSavedComparedToNextJourney > 10) {
@@ -23,11 +25,11 @@ const journeysWithDeltas = (journeys: Journey[]) =>
     };
   });
 
-type TableProps = {
+type Props = {
   journeys: Journey[];
 };
 
-const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
+const JourneysTable: React.VFC<Props> = ({ journeys }: Props) => (
   <div className="px-1 py-2">
     <div className="inline-block min-w-full overflow-hidden rounded-lg shadow">
       <table className="min-w-full leading-normal">
@@ -54,6 +56,7 @@ const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
               duration,
               minutesSavedComparedToNextJourney,
               transitLines,
+              warnings,
             }) => (
               <tr
                 key={departureTime.getTime()}
@@ -74,7 +77,13 @@ const JourneysTable: React.VFC<TableProps> = ({ journeys }: TableProps) => (
                 <th className="w-1/4 px-2 py-3 ">
                   {Math.round(minutesSavedComparedToNextJourney)} mins
                 </th>
-                <th className="w-1/4 px-2 py-3 ">{transitLines.join(', ')}</th>
+
+                <th className="w-1/4 px-2 py-3 ">
+                  {Boolean(warnings.length) && (
+                    <WarningTooltip warnings={warnings} />
+                  )}{' '}
+                  {transitLines.join(', ')}
+                </th>
               </tr>
             )
           )}

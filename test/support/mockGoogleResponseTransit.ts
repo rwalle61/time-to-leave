@@ -1,3 +1,6 @@
+import { irrelevantRouteWarnings } from '../../src/services/getJourney';
+import { mockWarning } from '../../src/services/mockWarnings';
+
 const mockGoogleResponseTransit: google.maps.DirectionsResult = {
   geocoded_waypoints: [
     {
@@ -1039,9 +1042,7 @@ const mockGoogleResponseTransit: google.maps.DirectionsResult = {
       overview_polyline:
         'ghbyHdlU}B`[{@|Hg@fCo@nBqAzCeClD_BfB_BbAmBj@yC\\iEUcDw@yCkA_FeC}EgD{@_AsCeDkC}Ce@c@uAqAg@_@o@c@kBi@s@C}@EiBFuB\\cKlBoXdFsCjAqAnAYZ[l@kAzBaBhDuBxEwAtDyGvQcBxEo@vB_@dCKjAQnBGv@Q|EUbFWnDGv@oApNmAjH}ArFoDfFgD`CqClAiFZ_EKsXeA{Ru@oIUgGEkDJZyDsBF@jBJnNA|AQvDeAxEq@`BmArB}ApAoMbEyO~BaEf@eBTmC@mCYuBa@qC_AqAo@{BsA{FaEwIwFm@Ss@Ei@Dw@P]Ta@d@q@vASr@Qv@EdAZ~HV~Ip@~Gj@lFBj@AtAGlAKx@Ol@e@`Aa@h@q@n@AHi@j@e@h@KVwGrOeO`^iAtCe@hA_@v@}AtCo@`AwBnCiHnJuQdVeDjE_@^}@^{Bj@w@HkCPUBuAQ_RiBkIw@uBI{@D?m@{@g@CBOg@Sw@Q?AAWsAIWI?GC]o@qEcKOWwATkARUBOIv@_F',
       summary: '',
-      warnings: [
-        'Walking directions are in beta. Use caution – This route may be missing sidewalks or pedestrian paths.',
-      ],
+      warnings: [...irrelevantRouteWarnings, mockWarning],
       waypoint_order: [],
       overview_path: [
         {},

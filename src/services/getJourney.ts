@@ -1,6 +1,17 @@
 import Journey from '../domain/Journey';
 import { getGoogleResponse } from './getGoogleResponse';
 
+const WALKING_ROUTE_WARNING =
+  'Walking directions are in beta. Use caution – This route may be missing sidewalks or pedestrian paths.';
+
+const WALKING_ROUTE_WARNING_FRENCH =
+  "Le calcul d'itinéraires piétons est en bêta. Faites attention – Cet itinéraire n'est peut-être pas complètement aménagé pour les piétons.";
+
+export const irrelevantRouteWarnings = [
+  WALKING_ROUTE_WARNING,
+  WALKING_ROUTE_WARNING_FRENCH,
+];
+
 type StepWithTransitDetails = google.maps.DirectionsStep & {
   transit: google.maps.TransitDetails;
 };
@@ -18,8 +29,14 @@ const extractJourney = (
   response: google.maps.DirectionsResult,
   searchTime: Date
 ): Journey => {
+  const recommendedRoute = response.routes[0];
+
+  const warnings = recommendedRoute.warnings.filter(
+    (warning) => !irrelevantRouteWarnings.includes(warning)
+  );
+
   // "A route with no waypoints will contain exactly one DirectionsLeg"
-  const recommendedJourney = response.routes[0].legs[0];
+  const recommendedJourney = recommendedRoute.legs[0];
 
   const transitLines = getTransitLines(recommendedJourney);
   const method = transitLines.length > 0 ? transitLines : ['WALK'];
@@ -29,6 +46,7 @@ const extractJourney = (
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     duration: recommendedJourney.duration!.value * 1000,
     transitLines: method,
+    warnings,
   };
   return journey;
 };
