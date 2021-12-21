@@ -1,44 +1,34 @@
 import Journey from '../domain/Journey';
+import { getGoogleResponse } from './getGoogleResponse';
 
-const getGoogleResponse = async (
-  originLatLng: google.maps.LatLngLiteral,
-  destinationLatLng: google.maps.LatLngLiteral,
-  searchTime: Date
-) => {
-  const directionsService = new google.maps.DirectionsService();
-  const travelMode = google.maps.TravelMode.TRANSIT;
-  const request: google.maps.DirectionsRequest = {
-    origin: originLatLng,
-    destination: destinationLatLng,
-    travelMode,
-    drivingOptions: {
-      departureTime: searchTime,
-    },
-    transitOptions: {
-      departureTime: searchTime,
-    },
-  };
-  const response = await directionsService.route(request);
-  return response;
+type StepWithTransitDetails = google.maps.DirectionsStep & {
+  transit: google.maps.TransitDetails;
 };
 
-const getTransitLines = ({ steps }: google.maps.DirectionsLeg) =>
-  steps
-    .filter(({ transit }) => transit)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    .map(({ transit }) => transit!.line.short_name || transit!.line.name);
+const hasTransitDetails = (
+  step: google.maps.DirectionsStep
+): step is StepWithTransitDetails => Boolean(step.transit);
 
-const extractJourney = (response: google.maps.DirectionsResult): Journey => {
+const getTransitLines = ({ steps }: google.maps.DirectionsLeg): string[] =>
+  steps
+    .filter(hasTransitDetails)
+    .map(({ transit }) => transit.line.short_name || transit.line.name);
+
+const extractJourney = (
+  response: google.maps.DirectionsResult,
+  searchTime: Date
+): Journey => {
   // "A route with no waypoints will contain exactly one DirectionsLeg"
   const recommendedJourney = response.routes[0].legs[0];
 
+  const transitLines = getTransitLines(recommendedJourney);
+  const method = transitLines.length > 0 ? transitLines : ['WALK'];
+
   const journey: Journey = {
-    departureTime:
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      recommendedJourney.departure_time!.value,
+    departureTime: recommendedJourney.departure_time?.value || searchTime,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     duration: recommendedJourney.duration!.value * 1000,
-    transitLines: getTransitLines(recommendedJourney),
+    transitLines: method,
   };
   return journey;
 };
