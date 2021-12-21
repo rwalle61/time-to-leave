@@ -44,15 +44,11 @@ const extractJourney = (response: google.maps.DirectionsResult): Journey => {
 };
 
 export const getJourney = async (
-  originLatLng: google.maps.LatLngLiteral,
-  destinationLatLng: google.maps.LatLngLiteral,
+  origin: google.maps.LatLngLiteral,
+  destination: google.maps.LatLngLiteral,
   searchTime: Date
-) => {
-  const response = await getGoogleResponse(
-    originLatLng,
-    destinationLatLng,
-    searchTime
-  );
-  const journey = extractJourney(response);
+): Promise<Journey> => {
+  const response = await getGoogleResponse(origin, destination, searchTime);
+  const journey = extractJourney(response, searchTime);
   return journey;
 };

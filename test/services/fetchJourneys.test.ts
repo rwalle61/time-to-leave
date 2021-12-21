@@ -51,14 +51,12 @@ describe('fetchJourneys', () => {
     beforeEach(() => {
       jest
         .spyOn(getJourneyModule, 'getJourney')
-        .mockImplementation(
-          async (originLatLng, destinationLatLng, searchTime) => ({
-            departureTime: searchTime,
-            duration:
-              searchTime < bestDepartureTime ? shortDuration : longDuration,
-            transitLines,
-          })
-        );
+        .mockImplementation(async (origin, destination, searchTime) => ({
+          departureTime: searchTime,
+          duration:
+            searchTime < bestDepartureTime ? shortDuration : longDuration,
+          transitLines,
+        }));
     });
 
     it('finds the best journeys', async () => {
@@ -99,15 +97,13 @@ describe('fetchJourneys', () => {
     beforeEach(() => {
       jest
         .spyOn(getJourneyModule, 'getJourney')
-        .mockImplementation(
-          async (originLatLng, destinationLatLng, searchTime) => ({
-            departureTime: searchTime,
-            duration: varyWithinExpectedBounds(
-              searchTime < bestDepartureTime ? shortDuration : longDuration
-            ),
-            transitLines,
-          })
-        );
+        .mockImplementation(async (origin, destination, searchTime) => ({
+          departureTime: searchTime,
+          duration: varyWithinExpectedBounds(
+            searchTime < bestDepartureTime ? shortDuration : longDuration
+          ),
+          transitLines,
+        }));
     });
 
     it('finds the best journeys', async () => {
@@ -141,19 +137,17 @@ describe('fetchJourneys', () => {
     beforeEach(() => {
       jest
         .spyOn(getJourneyModule, 'getJourney')
-        .mockImplementation(
-          async (originLatLng, destinationLatLng, searchTime) => ({
-            departureTime: searchTime,
-            duration:
-              // eslint-disable-next-line no-nested-ternary
-              searchTime < goodDepartureTime1
-                ? shortDuration1
-                : searchTime < goodDepartureTime2
-                ? shortDuration2
-                : longDuration,
-            transitLines,
-          })
-        );
+        .mockImplementation(async (origin, destination, searchTime) => ({
+          departureTime: searchTime,
+          duration:
+            // eslint-disable-next-line no-nested-ternary
+            searchTime < goodDepartureTime1
+              ? shortDuration1
+              : searchTime < goodDepartureTime2
+              ? shortDuration2
+              : longDuration,
+          transitLines,
+        }));
     });
 
     it('finds the best journeys', async () => {
@@ -197,15 +191,13 @@ describe('fetchJourneys', () => {
     beforeEach(() => {
       jest
         .spyOn(getJourneyModule, 'getJourney')
-        .mockImplementation(
-          async (originLatLng, destinationLatLng, searchTime) => ({
-            departureTime: isSameTime(searchTime, latestSearchTime)
-              ? superLateDepartureTime
-              : searchTime,
-            duration: 0,
-            transitLines,
-          })
-        );
+        .mockImplementation(async (origin, destination, searchTime) => ({
+          departureTime: isSameTime(searchTime, latestSearchTime)
+            ? superLateDepartureTime
+            : searchTime,
+          duration: 0,
+          transitLines,
+        }));
       jest.spyOn(logger, 'warn');
     });
 
@@ -234,17 +226,15 @@ describe('fetchJourneys', () => {
     beforeEach(() => {
       jest
         .spyOn(getJourneyModule, 'getJourney')
-        .mockImplementation(
-          async (originLatLng, destinationLatLng, searchTime) => ({
-            departureTime:
-              isSameTime(searchTime, earliestSearchTime) ||
-              isSameTime(searchTime, latestSearchTime)
-                ? searchTime
-                : lateDepartureTime,
-            duration: 0,
-            transitLines,
-          })
-        );
+        .mockImplementation(async (origin, destination, searchTime) => ({
+          departureTime:
+            isSameTime(searchTime, earliestSearchTime) ||
+            isSameTime(searchTime, latestSearchTime)
+              ? searchTime
+              : lateDepartureTime,
+          duration: 0,
+          transitLines,
+        }));
     });
 
     it("doesn't make duplicate journey requests (i.e. it doesn't search in wait times we've already identified)", async () => {
