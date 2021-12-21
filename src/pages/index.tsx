@@ -3,6 +3,7 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useErrorHandler } from 'react-error-boundary';
 import JourneysTable from '../components/JourneysTable';
+import { finishProgressBar, startProgressBar } from '../components/progressBar';
 import { RESTRICTED_API_KEY } from '../config';
 import {
   BRIXTON_STATION,
@@ -64,6 +65,8 @@ export const Home = (): JSX.Element => {
     }
     const updateJourneys = async (): Promise<void> => {
       try {
+        startProgressBar();
+
         const newJourneys = await fetchJourneys(
           origin.latLng,
           destination.latLng
@@ -74,6 +77,8 @@ export const Home = (): JSX.Element => {
         setJourneys(newJourneys);
       } catch (error) {
         handleError(error);
+      } finally {
+        finishProgressBar();
       }
     };
     updateJourneys();

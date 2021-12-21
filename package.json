@@ -24,6 +24,7 @@
     "node": ">=12"
   },
   "dependencies": {
+    "@badrap/bar-of-progress": "^0.1.2",
     "@googlemaps/js-api-loader": "^1.12.10",
     "next": "latest",
     "react": "^17.0.1",
