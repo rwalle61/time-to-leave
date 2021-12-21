@@ -69,7 +69,7 @@ export const Home = (): JSX.Element => {
           destination.latLng
         );
 
-        logger.log('newJourneys', newJourneys);
+        logger.debug('newJourneys', newJourneys);
 
         setJourneys(newJourneys);
       } catch (error) {
@@ -101,7 +101,7 @@ export const Home = (): JSX.Element => {
       }
     );
 
-    logger.log('autocomplete', autocomplete);
+    logger.debug('autocomplete', autocomplete);
 
     if (
       // eslint-disable-next-line no-underscore-dangle
@@ -127,7 +127,7 @@ export const Home = (): JSX.Element => {
         latLng: place.geometry.location!.toJSON(),
       };
 
-      logger.log('newPlace', newPlace);
+      logger.debug('newPlace', newPlace);
 
       setPlace(newPlace);
     });

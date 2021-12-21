@@ -59,7 +59,7 @@ export const findJourneys = async (
   const searchPeriod =
     latestSearchTime.getTime() - earliestSearchTime.getTime();
   const midpoint = new Date(earliestSearchTime.getTime() + searchPeriod / 2);
-  logger.log(
+  logger.debug(
     `earliestSearchTime: ${earliestSearchTime.toLocaleTimeString()}`,
     `latestSearchTime: ${latestSearchTime.toLocaleTimeString()}`,
     `midpoint: ${midpoint.toLocaleTimeString()}`,
@@ -84,7 +84,7 @@ export const findJourneys = async (
     midpoint
   );
 
-  logger.log(
+  logger.debug(
     `earliestJourneyDuration: ${millisecondsToMinutes(
       earliestJourneyDuration
     )} mins`,
