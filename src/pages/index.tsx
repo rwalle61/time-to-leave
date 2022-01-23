@@ -1,12 +1,10 @@
 import { Loader } from '@googlemaps/js-api-loader';
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useErrorHandler } from 'react-error-boundary';
 import JourneysTable from '../components/JourneysTable';
 import { finishProgressBar, startProgressBar } from '../components/progressBar';
 import { RESTRICTED_API_KEY } from '../config';
 import {
-  BRIXTON_STATION,
   COLCHESTER_LAT_LNG,
   HOME,
   TAUNTON_LAT_LNG,
@@ -14,8 +12,8 @@ import {
 import Journey from '../domain/Journey';
 import Location from '../domain/Location';
 import { fetchJourneys } from '../services/fetchJourneys';
-import getCityMapperLink from '../services/getCityMapperLink';
 import logger from '../services/logger';
+import SeeOnCityMapperButton from './SeeOnCityMapperButton';
 
 enum InputIds {
   Origin = 'origin-input',
@@ -27,7 +25,7 @@ export const Home = (): JSX.Element => {
 
   const [journeys, setJourneys] = useState<Journey[]>([]);
 
-  const [origin, setOrigin] = useState<Location>(BRIXTON_STATION);
+  const [origin, setOrigin] = useState<Location | null>(null);
 
   const [destination, setDestination] = useState<Location>(HOME);
 
@@ -60,7 +58,7 @@ export const Home = (): JSX.Element => {
   });
 
   useEffect(() => {
-    if (!loadedGoogleMapsSdk || !origin.latLng || !destination.latLng) {
+    if (!loadedGoogleMapsSdk || !origin?.latLng || !destination.latLng) {
       return;
     }
     const updateJourneys = async (): Promise<void> => {
@@ -157,7 +155,7 @@ export const Home = (): JSX.Element => {
         From:{' '}
         <input
           id={InputIds.Origin}
-          defaultValue={origin.name}
+          defaultValue={origin?.name}
           className="italic"
         />
       </p>
@@ -177,14 +175,7 @@ export const Home = (): JSX.Element => {
         >
           Use current location
         </button>
-        <Link href={getCityMapperLink(origin, destination)} passHref>
-          <button
-            type="button"
-            className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
-          >
-            See on CityMapper
-          </button>
-        </Link>
+        <SeeOnCityMapperButton origin={origin} destination={destination} />
       </div>
       {Boolean(journeys.length) && <JourneysTable journeys={journeys} />}
     </div>
