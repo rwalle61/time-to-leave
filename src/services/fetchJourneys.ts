@@ -10,6 +10,10 @@ import {
   minutesToMilliseconds,
 } from './time.utils';
 
+const EARLIEST_SEARCH_HOUR = 23;
+
+const LATEST_SEARCH_HOUR = 3; // Next day
+
 // Lower this to get nearer the best journey, at the expense of more search requests to Google
 // London tubes run every few minutes, so 6 minutes should be close enough
 export const minimumSearchPeriod = minutesToMilliseconds(6);
@@ -28,7 +32,7 @@ export const getEarliestSearchTime = (): Date => {
   const date = isPast6AM()
     ? new Date()
     : new Date(Date.now() - MILLISECONDS_PER_DAY);
-  date.setHours(22);
+  date.setHours(EARLIEST_SEARCH_HOUR);
   date.setMinutes(0);
   date.setSeconds(0);
   date.setMilliseconds(0);
@@ -40,7 +44,7 @@ export const getLatestSearchTime = (): Date => {
   const date = isPast6AM()
     ? new Date(Date.now() + MILLISECONDS_PER_DAY)
     : new Date();
-  date.setHours(4);
+  date.setHours(LATEST_SEARCH_HOUR);
   date.setMinutes(0);
   date.setSeconds(0);
   date.setMilliseconds(0);
