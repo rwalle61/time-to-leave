@@ -27,7 +27,11 @@ export const Home = (): JSX.Element => {
 
   const [origin, setOrigin] = useState<Location | null>(null);
 
+  const [originToShow, setOriginToShow] = useState('');
+
   const [destination, setDestination] = useState<Location>(HOME);
+
+  const [destinationToShow, setDestinationToShow] = useState('');
 
   const handleError = useErrorHandler();
 
@@ -40,6 +44,16 @@ export const Home = (): JSX.Element => {
       setOrigin({ name: 'Here', latLng });
     });
   };
+
+  useEffect(() => {
+    if (origin) {
+      setOriginToShow(origin.name);
+    }
+  }, [origin]);
+
+  useEffect(() => {
+    setDestinationToShow(destination.name);
+  }, [destination]);
 
   useEffect(() => {
     const load = async () => {
@@ -118,16 +132,21 @@ export const Home = (): JSX.Element => {
     }
 
     autocomplete.addListener('place_changed', () => {
-      type Place = Required<
-        Pick<google.maps.places.PlaceResult, typeof placeResultFields[number]>
+      type Place = Pick<
+        google.maps.places.PlaceResult,
+        typeof placeResultFields[number]
       >;
 
       const place = autocomplete.getPlace() as Place;
 
+      if (!place.name || !place.geometry?.location) {
+        logger.warn('Invalid place:', place);
+        return;
+      }
+
       const newPlace = {
         name: place.name,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        latLng: place.geometry.location!.toJSON(),
+        latLng: place.geometry.location.toJSON(),
       };
 
       logger.debug('newPlace', newPlace);
@@ -155,16 +174,22 @@ export const Home = (): JSX.Element => {
         From:{' '}
         <input
           id={InputIds.Origin}
-          defaultValue={origin?.name}
+          value={originToShow}
           className="italic"
+          onChange={(event) => {
+            setOriginToShow(event.target.value);
+          }}
         />
       </p>
       <p>
         To:{' '}
         <input
           id={InputIds.Destination}
-          defaultValue={destination.name}
+          value={destinationToShow}
           className="italic"
+          onChange={(event) => {
+            setDestinationToShow(event.target.value);
+          }}
         />
       </p>
       <div className="space-x-1 space-y-1">
