@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 // This is restricted in GCP so is safe-ish to expose
-export const RESTRICTED_API_KEY = 'AIzaSyDQPVH0i6h4kc2vqKmtwxJRpevLzxhnGyE';
+export const RESTRICTED_API_KEY = 'AIzaSyBd3kPyYX2adZJK8y_Ml4fNHhWzFsc3VN0';
 
 // `yarn dev` sets NODE_ENV to 'development'
 // `yarn test` sets NODE_ENV to 'test'
