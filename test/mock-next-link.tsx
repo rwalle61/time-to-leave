@@ -20,9 +20,9 @@ const MockNextLink = ({
 }: PropsWithChildren<LinkProps>): ReactElement => {
   const router = useRouter();
 
-  const onClick = (e: SyntheticEvent): void => {
+  const onClick = async (e: SyntheticEvent): Promise<void> => {
     e.preventDefault();
-    router.push(href, asHref ?? href);
+    await router.push(href, asHref ?? href);
   };
 
   return cloneElement(children as ReactElement, {

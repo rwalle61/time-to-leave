@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import * as configModule from '../../src/config';
 import { BRIXTON_STATION, HOME } from '../../src/domain/defaultLocations';
 import Journey from '../../src/domain/Journey';
@@ -56,6 +57,7 @@ describe('fetchJourneys', () => {
           duration:
             searchTime < bestDepartureTime ? shortDuration : longDuration,
           transitLines,
+          warnings: [],
         }));
     });
 
@@ -103,6 +105,7 @@ describe('fetchJourneys', () => {
             searchTime < bestDepartureTime ? shortDuration : longDuration
           ),
           transitLines,
+          warnings: [],
         }));
     });
 
@@ -147,6 +150,7 @@ describe('fetchJourneys', () => {
               ? shortDuration2
               : longDuration,
           transitLines,
+          warnings: [],
         }));
     });
 
@@ -174,6 +178,7 @@ describe('fetchJourneys', () => {
           departureTime: new Date(latestSearchTime),
           duration: 0,
           transitLines,
+          warnings: [],
         }));
     });
 
@@ -197,6 +202,7 @@ describe('fetchJourneys', () => {
             : searchTime,
           duration: 0,
           transitLines,
+          warnings: [],
         }));
       jest.spyOn(logger, 'warn');
     });
@@ -234,6 +240,7 @@ describe('fetchJourneys', () => {
               : lateDepartureTime,
           duration: 0,
           transitLines,
+          warnings: [],
         }));
     });
 

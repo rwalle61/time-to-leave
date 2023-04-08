@@ -27,6 +27,7 @@ extends:
   - plugin:jest/recommended
   - plugin:jest/style
   - plugin:@typescript-eslint/recommended
+  - plugin:@typescript-eslint/recommended-requiring-type-checking
   - plugin:tailwind/recommended
   - plugin:jsx-a11y/recommended
   - plugin:@next/next/recommended

@@ -16,7 +16,9 @@ const ErrorFallback = ({ error }: FallbackProps): ReactElement => (
     >
       Refresh
     </button>
-    <pre className="text-xs text-left whitespace-pre-wrap">{`${error.message}\n ${error.stack}`}</pre>
+    <pre className="text-xs text-left whitespace-pre-wrap">{`${
+      error.message
+    }\n ${error.stack || ''}`}</pre>
   </div>
 );
 

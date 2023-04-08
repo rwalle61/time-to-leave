@@ -68,6 +68,7 @@ export const Home = (): JSX.Element => {
       }
       setLoadedGoogleMapsSdk(true);
     };
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     load();
   });
 
@@ -93,6 +94,7 @@ export const Home = (): JSX.Element => {
         finishProgressBar();
       }
     };
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     updateJourneys();
   }, [loadedGoogleMapsSdk, origin, destination, handleError]);
 

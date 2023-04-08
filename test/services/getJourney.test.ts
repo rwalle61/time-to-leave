@@ -22,8 +22,8 @@ describe('getJourney', () => {
       const journey = await getJourney(origin, destination, departureTime);
 
       expect(journey).toMatchObject<Journey>({
-        departureTime: expect.any(Date),
-        duration: expect.any(Number),
+        departureTime: expect.any(Date) as Date,
+        duration: expect.any(Number) as number,
         transitLines: ['Victoria', 'Jubilee'],
         warnings: [mockWarning],
       });
@@ -41,8 +41,8 @@ describe('getJourney', () => {
       const journey = await getJourney(origin, destination, departureTime);
 
       expect(journey).toMatchObject<Journey>({
-        departureTime: expect.any(Date),
-        duration: expect.any(Number),
+        departureTime: expect.any(Date) as Date,
+        duration: expect.any(Number) as number,
         transitLines: ['WALK'],
         warnings: [],
       });

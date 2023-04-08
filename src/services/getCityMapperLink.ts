@@ -9,6 +9,6 @@ const getCityMapperLink = (origin: Location, destination: Location): string => {
     endname: destination.name,
   });
 
-  return `https://citymapper.com/directions?${queryParams}`;
+  return `https://citymapper.com/directions?${queryParams.toString()}`;
 };
 export default getCityMapperLink;

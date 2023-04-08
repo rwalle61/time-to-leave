@@ -16,6 +16,7 @@ const Providers = ({ children }: { children: React.ReactElement }) => children;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const customRender = (ui: any, options = {}): unknown =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   render(ui, { wrapper: Providers, ...options });
 
 export * from '@testing-library/react';
