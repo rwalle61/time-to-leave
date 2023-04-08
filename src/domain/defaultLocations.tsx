@@ -24,12 +24,16 @@ export const WINCHESTER_TRAIN_STATION: Location = {
   },
 };
 
-export const TAUNTON_LAT_LNG: google.maps.LatLngLiteral = {
+// In South West
+const TAUNTON_LAT_LNG: google.maps.LatLngLiteral = {
   lat: 51.0214619,
   lng: -3.1174915,
 };
 
-export const COLCHESTER_LAT_LNG: google.maps.LatLngLiteral = {
+// In South East
+const COLCHESTER_LAT_LNG: google.maps.LatLngLiteral = {
   lat: 51.8861673,
   lng: 0.8685421,
 };
+
+export const LONDON_AND_BRISTOL_BOUNDS = [TAUNTON_LAT_LNG, COLCHESTER_LAT_LNG];

@@ -65,9 +65,9 @@ export const findJourneys = async (
   const midpoint = new Date(earliestSearchTime.getTime() + searchPeriod / 2);
   logger.debug(
     `earliestSearchTime: ${earliestSearchTime.toLocaleTimeString()}`,
-    `latestSearchTime: ${latestSearchTime.toLocaleTimeString()}`,
-    `midpoint: ${midpoint.toLocaleTimeString()}`,
-    `searchPeriod: ${millisecondsToMinutes(searchPeriod)} mins`
+    `\nlatestSearchTime: ${latestSearchTime.toLocaleTimeString()}`,
+    `\nmidpoint: ${midpoint.toLocaleTimeString()}`,
+    `\nsearchPeriod: ${millisecondsToMinutes(searchPeriod)} mins`
   );
 
   if (latestSearchTime < earliestSearchTime) {
@@ -92,13 +92,13 @@ export const findJourneys = async (
     `earliestJourneyDuration: ${millisecondsToMinutes(
       earliestJourneyDuration
     )} mins`,
-    `latestJourneyDuration: ${millisecondsToMinutes(
+    `\nlatestJourneyDuration: ${millisecondsToMinutes(
       latestJourneyDuration
     )} mins`,
-    `journeyAfterMidpoint.duration: ${millisecondsToMinutes(
+    `\njourneyAfterMidpoint.duration: ${millisecondsToMinutes(
       journeyAfterMidpoint.duration
     )} mins`,
-    `journeyAfterMidpoint.departureTime: ${journeyAfterMidpoint.departureTime.toLocaleTimeString()}`
+    `\njourneyAfterMidpoint.departureTime: ${journeyAfterMidpoint.departureTime.toLocaleTimeString()}`
   );
   const findJourneysBeforeMidpoint = () =>
     findJourneys(

@@ -4,16 +4,12 @@ import { useErrorHandler } from 'react-error-boundary';
 import JourneysTable from '../components/JourneysTable';
 import { finishProgressBar, startProgressBar } from '../components/progressBar';
 import { RESTRICTED_API_KEY } from '../config';
-import {
-  COLCHESTER_LAT_LNG,
-  HOME,
-  TAUNTON_LAT_LNG,
-} from '../domain/defaultLocations';
+import { HOME, LONDON_AND_BRISTOL_BOUNDS } from '../domain/defaultLocations';
 import Journey from '../domain/Journey';
 import Location from '../domain/Location';
 import { fetchJourneys } from '../services/fetchJourneys';
 import logger from '../services/logger';
-import SeeOnCityMapperButton from './SeeOnCityMapperButton';
+import SeeOnCityMapperButton from '../components/SeeOnCityMapperButton';
 
 enum InputIds {
   Origin = 'origin-input',
@@ -112,10 +108,7 @@ export const Home = (): JSX.Element => {
     const autocomplete = new google.maps.places.Autocomplete(
       input as HTMLInputElement,
       {
-        bounds: new google.maps.LatLngBounds(
-          TAUNTON_LAT_LNG,
-          COLCHESTER_LAT_LNG
-        ),
+        bounds: new google.maps.LatLngBounds(...LONDON_AND_BRISTOL_BOUNDS),
         fields: placeResultFields,
       }
     );
