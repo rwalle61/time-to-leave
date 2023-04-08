@@ -1,15 +1,14 @@
 import Journey from '../domain/Journey';
 import { getGoogleResponse } from './getGoogleResponse';
 
-const WALKING_ROUTE_WARNING =
-  'Walking directions are in beta. Use caution – This route may be missing sidewalks or pedestrian paths.';
+const WALKING_ROUTE_WARNING_START = 'Walking directions are in beta';
 
-const WALKING_ROUTE_WARNING_FRENCH =
-  "Le calcul d'itinéraires piétons est en bêta. Faites attention – Cet itinéraire n'est peut-être pas complètement aménagé pour les piétons.";
+const WALKING_ROUTE_WARNING_START_FRENCH =
+  "Le calcul d'itinéraires piétons est en bêta";
 
-export const irrelevantRouteWarnings = [
-  WALKING_ROUTE_WARNING,
-  WALKING_ROUTE_WARNING_FRENCH,
+export const irrelevantRouteWarningStarts = [
+  WALKING_ROUTE_WARNING_START,
+  WALKING_ROUTE_WARNING_START_FRENCH,
 ];
 
 type StepWithTransitDetails = google.maps.DirectionsStep & {
@@ -32,7 +31,10 @@ const extractJourney = (
   const recommendedRoute = response.routes[0];
 
   const warnings = recommendedRoute.warnings.filter(
-    (warning) => !irrelevantRouteWarnings.includes(warning)
+    (warning) =>
+      !irrelevantRouteWarningStarts.some((warningStart) =>
+        warning.startsWith(warningStart)
+      )
   );
 
   // "A route with no waypoints will contain exactly one DirectionsLeg"

@@ -1,4 +1,4 @@
-import { irrelevantRouteWarnings } from '../../src/services/getJourney';
+import { irrelevantRouteWarningStarts } from '../../src/services/getJourney';
 
 const mockGoogleResponseOnlyWalking: google.maps.DirectionsResult = {
   geocoded_waypoints: [
@@ -97,7 +97,7 @@ const mockGoogleResponseOnlyWalking: google.maps.DirectionsResult = {
       ],
       overview_polyline: 'erryHbe`@@I',
       summary: 'Lancaster Grove',
-      warnings: irrelevantRouteWarnings,
+      warnings: irrelevantRouteWarningStarts,
       waypoint_order: [],
       overview_path: [{} as google.maps.LatLng, {} as google.maps.LatLng],
     } as google.maps.DirectionsRoute,
