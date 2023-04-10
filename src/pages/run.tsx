@@ -4,6 +4,7 @@ import {
   DirectionsRun,
   DirectionsWalk,
   MyLocation,
+  SwapVert,
 } from '@mui/icons-material';
 import { TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -27,9 +28,9 @@ import { palette } from '../theme';
 export const Home = (): JSX.Element => {
   const [loadedGoogleMapsSdk, setLoadedGoogleMapsSdk] = useState(false);
 
-  const [journeys, setJourneys] = useState<JourneyWithSteps[]>([]);
+  const [journey, setJourney] = useState<JourneyWithSteps | null>(null);
 
-  const [origin, setOrigin] = useState<Location>(HOME);
+  const [origin, setOrigin] = useState<Location | null>(HOME);
 
   const [originToShow, setOriginToShow] = useState('');
 
@@ -53,14 +54,20 @@ export const Home = (): JSX.Element => {
     });
   };
 
+  const swapOriginAndDestination = () => {
+    const currentOrigin = origin;
+    const currentDestination = destination;
+
+    setOrigin(currentDestination);
+    setDestination(currentOrigin);
+  };
+
   useEffect(() => {
-    setOriginToShow(origin.name);
+    setOriginToShow(origin?.name || '');
   }, [origin]);
 
   useEffect(() => {
-    if (destination) {
-      setDestinationToShow(destination.name);
-    }
+    setDestinationToShow(destination?.name || '');
   }, [destination]);
 
   useEffect(() => {
@@ -81,27 +88,27 @@ export const Home = (): JSX.Element => {
   });
 
   useEffect(() => {
-    if (!loadedGoogleMapsSdk || !origin.latLng || !destination?.latLng) {
+    if (!loadedGoogleMapsSdk || !origin?.latLng || !destination?.latLng) {
       return;
     }
     const updateJourneys = async (): Promise<void> => {
       try {
         startProgressBar();
 
-        const journey = await fetchBestRunJourney(
+        const newJourney = await fetchBestRunJourney(
           origin,
           destination,
           new Date(),
           runSpeed
         );
 
-        logger.log('newJourney', journey, '\nrunSpeed', runSpeed);
+        logger.log('newJourney', newJourney, '\nrunSpeed', runSpeed);
 
-        setJourneys([journey]);
+        setJourney(newJourney);
       } catch (error) {
         if (isGoogleAPIZeroResultsError(error)) {
           setNoRoutesFoundError(true);
-          setJourneys([]);
+          setJourney(null);
           return;
         }
 
@@ -261,10 +268,18 @@ export const Home = (): JSX.Element => {
         <Button
           variant="contained"
           endIcon={<MyLocation />}
-          onClick={() => setOriginToCurrentLocation()}
+          onClick={setOriginToCurrentLocation}
           className="my-1 mx-0.5"
         >
-          Use Current Location
+          From Current Location
+        </Button>
+        <Button
+          variant="contained"
+          endIcon={<SwapVert />}
+          onClick={swapOriginAndDestination}
+          className="my-1 mx-0.5"
+        >
+          Swap
         </Button>
         <SeeOnCityMapperButton
           origin={origin}
@@ -273,10 +288,10 @@ export const Home = (): JSX.Element => {
         />
       </div>
       {ToggleMoveSpeed}
-      {Boolean(journeys.length) && (
+      {journey && (
         <>
-          <JourneysWithStepsTable journeys={journeys} />
-          <StepsTable steps={journeys[0].steps} />
+          <JourneysWithStepsTable journeys={[journey]} />
+          <StepsTable steps={journey.steps} />
         </>
       )}
     </div>

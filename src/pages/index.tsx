@@ -1,5 +1,5 @@
 import { Loader } from '@googlemaps/js-api-loader';
-import { MyLocation } from '@mui/icons-material';
+import { MyLocation, SwapVert } from '@mui/icons-material';
 import { Button, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useErrorHandler } from 'react-error-boundary';
@@ -32,7 +32,7 @@ export const Home = (): JSX.Element => {
 
   const [originToShow, setOriginToShow] = useState('');
 
-  const [destination, setDestination] = useState<Location>(HOME);
+  const [destination, setDestination] = useState<Location | null>(HOME);
 
   const [destinationToShow, setDestinationToShow] = useState('');
 
@@ -50,14 +50,20 @@ export const Home = (): JSX.Element => {
     });
   };
 
+  const swapOriginAndDestination = () => {
+    const currentOrigin = origin;
+    const currentDestination = destination;
+
+    setOrigin(currentDestination);
+    setDestination(currentOrigin);
+  };
+
   useEffect(() => {
-    if (origin) {
-      setOriginToShow(origin.name);
-    }
+    setOriginToShow(origin?.name || '');
   }, [origin]);
 
   useEffect(() => {
-    setDestinationToShow(destination.name);
+    setDestinationToShow(destination?.name || '');
   }, [destination]);
 
   useEffect(() => {
@@ -78,7 +84,7 @@ export const Home = (): JSX.Element => {
   });
 
   useEffect(() => {
-    if (!loadedGoogleMapsSdk || !origin?.latLng || !destination.latLng) {
+    if (!loadedGoogleMapsSdk || !origin?.latLng || !destination?.latLng) {
       return;
     }
     const updateJourneys = async (): Promise<void> => {
@@ -234,10 +240,18 @@ export const Home = (): JSX.Element => {
         <Button
           variant="contained"
           endIcon={<MyLocation />}
-          onClick={() => setOriginToCurrentLocation()}
+          onClick={setOriginToCurrentLocation}
           className="my-1 mx-0.5"
         >
-          Use Current Location
+          From Current Location
+        </Button>
+        <Button
+          variant="contained"
+          endIcon={<SwapVert />}
+          onClick={swapOriginAndDestination}
+          className="my-1 mx-0.5"
+        >
+          Swap
         </Button>
         <SeeOnCityMapperButton
           origin={origin}
