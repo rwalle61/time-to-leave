@@ -1,0 +1,17 @@
+{
+  "name": "xcvtzrg-zkngts4",
+  "hash": "geq2efgr3dAPS4uAt+AzdYCuWqGxq52fHjXLPyyzAbw=",
+  "description": "Image Lambda@Edge for Next CloudFront distribution",
+  "memory": 512,
+  "timeout": 10,
+  "code": "/Users/richard.waller/Documents/SideProjects/time-to-leave/.serverless_nextjs/image-lambda",
+  "shims": [],
+  "handler": "index.handler",
+  "runtime": "nodejs14.x",
+  "env": {},
+  "role": {
+    "arn": "arn:aws:iam::279003619356:role/xcvtzrg-cr6suk"
+  },
+  "arn": "arn:aws:lambda:us-east-1:279003619356:function:xcvtzrg-zkngts4",
+  "region": "us-east-1"
+}

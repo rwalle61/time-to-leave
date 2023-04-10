@@ -31,5 +31,5 @@ yarn-error.log*
 
 # vercel
 .vercel
-.serverless
+# .serverless # See https://serverless-nextjs.com/docs/faq/#cicd-a-new-cloudfront-distribution-is-created-on-every-ci-build-i-wasnt-expecting-that
 .serverless_nextjs
