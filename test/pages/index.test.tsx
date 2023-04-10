@@ -6,7 +6,7 @@ describe('Home page', () => {
   it('loads the page without blowing up', () => {
     render(<Home />);
 
-    expect(screen.getByText('From:')).toBeInTheDocument();
-    expect(screen.getByText('To:')).toBeInTheDocument();
+    expect(screen.getAllByText('From')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('To')[0]).toBeInTheDocument();
   });
 });

@@ -1,36 +1,42 @@
 import { Loader } from '@googlemaps/js-api-loader';
-import { MyLocation } from '@mui/icons-material';
-import { Button, TextField } from '@mui/material';
+import {
+  DirectionsBike,
+  DirectionsRun,
+  DirectionsWalk,
+  MyLocation,
+} from '@mui/icons-material';
+import { TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
 import { useErrorHandler } from 'react-error-boundary';
-import JourneysTable from '../components/JourneysTable';
+import { InputIds } from '.';
+import JourneysWithStepsTable from '../components/JourneysWithStepsTable';
 import SeeOnCityMapperButton from '../components/SeeOnCityMapperButton';
+import StepsTable from '../components/StepsTable';
 import { finishProgressBar, startProgressBar } from '../components/progressBar';
 import { RESTRICTED_API_KEY } from '../config';
-import Journey from '../domain/Journey';
+import { JourneyWithSteps } from '../domain/Journey';
 import Location from '../domain/Location';
+import { MoveSpeed } from '../domain/MoveSpeed';
 import { HOME, LONDON_AND_BRISTOL_BOUNDS } from '../domain/defaultLocations';
-import { fetchJourneys } from '../services/fetchJourneys';
+import { fetchBestRunJourney } from '../services/fetchBestRunJourney';
 import logger from '../services/logger';
 import { palette } from '../theme';
-
-export enum InputIds {
-  Origin = 'origin-input',
-  Destination = 'destination-input',
-}
 
 export const Home = (): JSX.Element => {
   const [loadedGoogleMapsSdk, setLoadedGoogleMapsSdk] = useState(false);
 
-  const [journeys, setJourneys] = useState<Journey[]>([]);
+  const [journeys, setJourneys] = useState<JourneyWithSteps[]>([]);
 
-  const [origin, setOrigin] = useState<Location | null>(null);
+  const [origin, setOrigin] = useState<Location>(HOME);
 
   const [originToShow, setOriginToShow] = useState('');
 
-  const [destination, setDestination] = useState<Location>(HOME);
+  const [destination, setDestination] = useState<Location | null>(null);
 
   const [destinationToShow, setDestinationToShow] = useState('');
+
+  const [runSpeed, setMoveSpeed] = useState(MoveSpeed.Walk);
 
   const handleError = useErrorHandler();
 
@@ -45,13 +51,13 @@ export const Home = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (origin) {
-      setOriginToShow(origin.name);
-    }
+    setOriginToShow(origin.name);
   }, [origin]);
 
   useEffect(() => {
-    setDestinationToShow(destination.name);
+    if (destination) {
+      setDestinationToShow(destination.name);
+    }
   }, [destination]);
 
   useEffect(() => {
@@ -72,21 +78,23 @@ export const Home = (): JSX.Element => {
   });
 
   useEffect(() => {
-    if (!loadedGoogleMapsSdk || !origin?.latLng || !destination.latLng) {
+    if (!loadedGoogleMapsSdk || !origin.latLng || !destination?.latLng) {
       return;
     }
     const updateJourneys = async (): Promise<void> => {
       try {
         startProgressBar();
 
-        const newJourneys = await fetchJourneys(
-          origin.latLng,
-          destination.latLng
+        const journey = await fetchBestRunJourney(
+          origin,
+          destination,
+          new Date(),
+          runSpeed
         );
 
-        logger.debug('newJourneys', newJourneys);
+        logger.log('newJourney', journey, '\nrunSpeed', runSpeed);
 
-        setJourneys(newJourneys);
+        setJourneys([journey]);
       } catch (error) {
         handleError(error);
       } finally {
@@ -95,7 +103,7 @@ export const Home = (): JSX.Element => {
     };
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     updateJourneys();
-  }, [loadedGoogleMapsSdk, origin, destination, handleError]);
+  }, [loadedGoogleMapsSdk, origin, destination, handleError, runSpeed]);
 
   const setupPlaceChangedListener = (
     inputElementId: InputIds,
@@ -209,6 +217,28 @@ export const Home = (): JSX.Element => {
     </div>
   );
 
+  const ToggleMoveSpeed = (
+    <ToggleButtonGroup
+      value={runSpeed}
+      color="primary"
+      exclusive
+      onChange={(event: React.MouseEvent<HTMLElement>, newSpeed: MoveSpeed) =>
+        setMoveSpeed(newSpeed)
+      }
+      aria-label="MoveSpeed"
+    >
+      <ToggleButton value={MoveSpeed.Walk} aria-label="walk">
+        <DirectionsWalk />
+      </ToggleButton>
+      <ToggleButton value={MoveSpeed.Jog} aria-label="jog">
+        <DirectionsRun />
+      </ToggleButton>
+      <ToggleButton value={MoveSpeed.Sprint} aria-label="sprint">
+        <DirectionsBike />
+      </ToggleButton>
+    </ToggleButtonGroup>
+  );
+
   return (
     <div className="container px-2 py-2 mx-auto text-lg text-center space-y-2">
       {LocationSelector}
@@ -227,7 +257,13 @@ export const Home = (): JSX.Element => {
           className="my-1 mx-0.5"
         />
       </div>
-      {Boolean(journeys.length) && <JourneysTable journeys={journeys} />}
+      {ToggleMoveSpeed}
+      {Boolean(journeys.length) && (
+        <>
+          <JourneysWithStepsTable journeys={journeys} />
+          <StepsTable steps={journeys[0].steps} />
+        </>
+      )}
     </div>
   );
 };

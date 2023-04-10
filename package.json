@@ -25,7 +25,11 @@
   },
   "dependencies": {
     "@badrap/bar-of-progress": "^0.1.2",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
     "@googlemaps/js-api-loader": "^1.12.10",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.11.16",
     "next": "latest",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

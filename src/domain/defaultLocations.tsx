@@ -8,6 +8,38 @@ export const HOME: Location = {
   },
 };
 
+export const SWISS_COTTAGE_STATION: Location = {
+  name: 'Swiss Cottage Underground Station',
+  latLng: {
+    lat: 51.5430314,
+    lng: -0.1757082,
+  },
+};
+
+export const PADDINGTON_STATION: Location = {
+  name: 'Paddington',
+  latLng: {
+    lat: 51.515973,
+    lng: -0.174943,
+  },
+};
+
+export const STRATFORD_STATION: Location = {
+  name: 'Stratford',
+  latLng: {
+    lat: 51.5411893,
+    lng: -0.003344,
+  },
+};
+
+export const BOBBY_MOORE_ACADEMY: Location = {
+  name: 'Bobby Moore Academy (Primary)',
+  latLng: {
+    lat: 51.53895350000001,
+    lng: -0.0201439,
+  },
+};
+
 export const BRIXTON_STATION: Location = {
   name: 'Brixton Station',
   latLng: {

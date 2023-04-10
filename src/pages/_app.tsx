@@ -1,14 +1,16 @@
+import { ThemeProvider, createTheme } from '@mui/material';
 import type { AppProps } from 'next/app';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'tailwindcss/tailwind.css';
 import AppHead from '../components/AppHead';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
+import { theme } from '../theme';
 
 // eslint-disable-next-line react/function-component-definition, prefer-arrow/prefer-arrow-functions
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <ThemeProvider theme={createTheme(theme)}>
       <AppHead />
       <Header />
       <ErrorBoundary>
@@ -17,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           {...pageProps}
         />
       </ErrorBoundary>
-    </>
+    </ThemeProvider>
   );
 }
 

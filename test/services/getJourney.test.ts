@@ -1,7 +1,7 @@
 import { BRIXTON_STATION, HOME } from '../../src/domain/defaultLocations';
 import Journey from '../../src/domain/Journey';
 import * as getGoogleResponseModule from '../../src/services/getGoogleResponse';
-import { getJourney } from '../../src/services/getJourney';
+import { getJourney, WALK_METHOD } from '../../src/services/getJourney';
 import { mockWarning } from '../../src/services/mockWarnings';
 import mockGoogleResponseOnlyWalking from '../support/mockGoogleResponseOnlyWalking';
 import mockGoogleResponseTransit from '../support/mockGoogleResponseTransit';
@@ -43,7 +43,7 @@ describe('getJourney', () => {
       expect(journey).toMatchObject<Journey>({
         departureTime: expect.any(Date) as Date,
         duration: expect.any(Number) as number,
-        transitLines: ['WALK'],
+        transitLines: [WALK_METHOD],
         warnings: [],
       });
     });

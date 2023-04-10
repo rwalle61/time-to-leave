@@ -11,11 +11,18 @@ export const irrelevantRouteWarningStarts = [
   WALKING_ROUTE_WARNING_START_FRENCH,
 ];
 
+export const WALK_METHOD = 'WALK';
+
+export type DirectionsLeg = google.maps.DirectionsLeg & {
+  duration: google.maps.Duration;
+  distance: google.maps.Distance;
+};
+
 type StepWithTransitDetails = google.maps.DirectionsStep & {
   transit: google.maps.TransitDetails;
 };
 
-const hasTransitDetails = (
+export const hasTransitDetails = (
   step: google.maps.DirectionsStep
 ): step is StepWithTransitDetails => Boolean(step.transit);
 
@@ -38,15 +45,14 @@ const extractJourney = (
   );
 
   // "A route with no waypoints will contain exactly one DirectionsLeg"
-  const recommendedJourney = recommendedRoute.legs[0];
+  const recommendedJourney = recommendedRoute.legs[0] as DirectionsLeg;
 
   const transitLines = getTransitLines(recommendedJourney);
-  const method = transitLines.length > 0 ? transitLines : ['WALK'];
+  const method = transitLines.length > 0 ? transitLines : [WALK_METHOD];
 
   const journey: Journey = {
     departureTime: recommendedJourney.departure_time?.value || searchTime,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    duration: recommendedJourney.duration!.value * 1000,
+    duration: recommendedJourney.duration.value * 1000,
     transitLines: method,
     warnings,
   };

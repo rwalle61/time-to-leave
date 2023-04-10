@@ -13,11 +13,10 @@ export const getGoogleResponse = async (
   origin: google.maps.LatLngLiteral,
   destination: google.maps.LatLngLiteral,
   searchTime: Date,
+  travelMode = google.maps.TravelMode.TRANSIT,
   attempts = 0
 ): Promise<google.maps.DirectionsResult> => {
   const directionsService = new google.maps.DirectionsService();
-
-  const travelMode = google.maps.TravelMode.TRANSIT;
 
   const request: google.maps.DirectionsRequest = {
     origin,
@@ -28,10 +27,12 @@ export const getGoogleResponse = async (
     },
   };
 
-  let response: google.maps.DirectionsResult;
-
   try {
-    response = await directionsService.route(request);
+    const response = await directionsService.route(request);
+
+    logger.debug('response', response);
+
+    return response;
   } catch (error) {
     logger.warn(
       'error.code',
@@ -45,10 +46,14 @@ export const getGoogleResponse = async (
       (error as GoogleRequestError).code === 'OVER_QUERY_LIMIT'
     ) {
       await sleep(RETRY_DELAY);
-      return getGoogleResponse(origin, destination, searchTime, attempts + 1);
+      return getGoogleResponse(
+        origin,
+        destination,
+        searchTime,
+        travelMode,
+        attempts + 1
+      );
     }
     throw error;
   }
-
-  return response;
 };

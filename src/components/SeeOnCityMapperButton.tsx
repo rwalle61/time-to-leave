@@ -1,27 +1,36 @@
+import { Launch } from '@mui/icons-material';
+import { Button } from '@mui/material';
 import Link from 'next/link';
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import Location from '../domain/Location';
 import getCityMapperLink from '../services/getCityMapperLink';
 
 type Props = {
   origin: Location | null;
-  destination: Location;
+  destination: Location | null;
+  className?: string;
 };
 
-const SeeOnCityMapperButton = ({ origin, destination }: Props): ReactElement =>
-  origin ? (
+const SeeOnCityMapperButton = ({
+  origin,
+  destination,
+  className,
+}: Props): ReactElement =>
+  origin && destination ? (
     <Link href={getCityMapperLink(origin, destination)} passHref>
-      <button
-        type="button"
-        className="inline-flex px-2 py-1 text-white bg-purple-400 rounded-xl hover:bg-black hover:text-white hover:border-transparent"
-      >
-        See on CityMapper
-      </button>
+      <Button variant="contained" endIcon={<Launch />} className={className}>
+        See On CityMapper
+      </Button>
     </Link>
   ) : (
-    <div className="inline-flex px-2 py-1 text-white bg-purple-200 rounded-xl">
-      See on CityMapper
-    </div>
+    <Button
+      variant="contained"
+      disabled
+      endIcon={<Launch />}
+      className={className}
+    >
+      See On CityMapper
+    </Button>
   );
 
 export default SeeOnCityMapperButton;
