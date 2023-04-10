@@ -11,8 +11,12 @@ import Journey from '../domain/Journey';
 import Location from '../domain/Location';
 import { HOME, LONDON_AND_BRISTOL_BOUNDS } from '../domain/defaultLocations';
 import { fetchJourneys } from '../services/fetchJourneys';
+import { isGoogleAPIZeroResultsError } from '../services/getGoogleResponse';
 import logger from '../services/logger';
 import { palette } from '../theme';
+
+export const NoRoutesFoundHelperText =
+  'No routes found between these locations';
 
 export enum InputIds {
   Origin = 'origin-input',
@@ -31,6 +35,8 @@ export const Home = (): JSX.Element => {
   const [destination, setDestination] = useState<Location>(HOME);
 
   const [destinationToShow, setDestinationToShow] = useState('');
+
+  const [noRoutesFoundError, setNoRoutesFoundError] = useState(false);
 
   const handleError = useErrorHandler();
 
@@ -88,6 +94,12 @@ export const Home = (): JSX.Element => {
 
         setJourneys(newJourneys);
       } catch (error) {
+        if (isGoogleAPIZeroResultsError(error)) {
+          setNoRoutesFoundError(true);
+          setJourneys([]);
+          return;
+        }
+
         handleError(error);
       } finally {
         finishProgressBar();
@@ -183,8 +195,11 @@ export const Home = (): JSX.Element => {
           value={originToShow}
           className="italic"
           onChange={(event) => {
+            setNoRoutesFoundError(false);
             setOriginToShow(event.target.value);
           }}
+          error={noRoutesFoundError}
+          helperText={noRoutesFoundError && NoRoutesFoundHelperText}
         />
       </div>
       <div>
@@ -202,8 +217,11 @@ export const Home = (): JSX.Element => {
           className="italic"
           variant="outlined"
           onChange={(event) => {
+            setNoRoutesFoundError(false);
             setDestinationToShow(event.target.value);
           }}
+          error={noRoutesFoundError}
+          helperText={noRoutesFoundError && NoRoutesFoundHelperText}
         />
       </div>
     </div>

@@ -9,7 +9,7 @@ import { TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
 import { useErrorHandler } from 'react-error-boundary';
-import { InputIds } from '.';
+import { InputIds, NoRoutesFoundHelperText } from '.';
 import JourneysWithStepsTable from '../components/JourneysWithStepsTable';
 import SeeOnCityMapperButton from '../components/SeeOnCityMapperButton';
 import StepsTable from '../components/StepsTable';
@@ -20,6 +20,7 @@ import Location from '../domain/Location';
 import { MoveSpeed } from '../domain/MoveSpeed';
 import { HOME, LONDON_AND_BRISTOL_BOUNDS } from '../domain/defaultLocations';
 import { fetchBestRunJourney } from '../services/fetchBestRunJourney';
+import { isGoogleAPIZeroResultsError } from '../services/getGoogleResponse';
 import logger from '../services/logger';
 import { palette } from '../theme';
 
@@ -37,6 +38,8 @@ export const Home = (): JSX.Element => {
   const [destinationToShow, setDestinationToShow] = useState('');
 
   const [runSpeed, setMoveSpeed] = useState(MoveSpeed.Walk);
+
+  const [noRoutesFoundError, setNoRoutesFoundError] = useState(false);
 
   const handleError = useErrorHandler();
 
@@ -96,6 +99,12 @@ export const Home = (): JSX.Element => {
 
         setJourneys([journey]);
       } catch (error) {
+        if (isGoogleAPIZeroResultsError(error)) {
+          setNoRoutesFoundError(true);
+          setJourneys([]);
+          return;
+        }
+
         handleError(error);
       } finally {
         finishProgressBar();
@@ -191,8 +200,11 @@ export const Home = (): JSX.Element => {
           value={originToShow}
           className="italic"
           onChange={(event) => {
+            setNoRoutesFoundError(false);
             setOriginToShow(event.target.value);
           }}
+          error={noRoutesFoundError}
+          helperText={noRoutesFoundError && NoRoutesFoundHelperText}
         />
       </div>
       <div>
@@ -210,8 +222,11 @@ export const Home = (): JSX.Element => {
           className="italic"
           variant="outlined"
           onChange={(event) => {
+            setNoRoutesFoundError(false);
             setDestinationToShow(event.target.value);
           }}
+          error={noRoutesFoundError}
+          helperText={noRoutesFoundError && NoRoutesFoundHelperText}
         />
       </div>
     </div>

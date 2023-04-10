@@ -6,8 +6,19 @@ const RETRY_DELAY = 1000;
 const numRetries = 2;
 
 type GoogleRequestError = {
+  message: string;
+  stack: string;
+  endpoint: 'DIRECTIONS_ROUTE';
   code: google.maps.DirectionsStatus;
+  name: 'MapsRequestError';
 };
+
+export const isGoogleAPIZeroResultsError = (
+  error: unknown
+): error is GoogleRequestError =>
+  error instanceof Error &&
+  (error as GoogleRequestError)?.code ===
+    google.maps.DirectionsStatus.ZERO_RESULTS;
 
 export const getGoogleResponse = async (
   origin: google.maps.LatLngLiteral,
@@ -37,7 +48,9 @@ export const getGoogleResponse = async (
     logger.warn(
       'error.code',
       (error as GoogleRequestError)?.code,
-      'attempts',
+      '\nerror.message',
+      (error as GoogleRequestError)?.message,
+      '\nattempts',
       attempts
     );
 
