@@ -15,22 +15,12 @@ const SeeOnCityMapperButton = ({
   origin,
   destination,
   className,
-}: Props): ReactElement =>
-  origin && destination ? (
-    <Link href={getCityMapperLink(origin, destination)} passHref>
-      <Button variant="contained" endIcon={<Launch />} className={className}>
-        See On CityMapper
-      </Button>
-    </Link>
-  ) : (
-    <Button
-      variant="contained"
-      disabled
-      endIcon={<Launch />}
-      className={className}
-    >
+}: Props): ReactElement => (
+  <Link href={getCityMapperLink(origin, destination)} passHref>
+    <Button variant="contained" endIcon={<Launch />} className={className}>
       See On CityMapper
     </Button>
-  );
+  </Link>
+);
 
 export default SeeOnCityMapperButton;
