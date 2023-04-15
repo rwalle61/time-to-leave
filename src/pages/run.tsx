@@ -38,7 +38,7 @@ export const Home = (): JSX.Element => {
 
   const [destinationToShow, setDestinationToShow] = useState('');
 
-  const [runSpeed, setMoveSpeed] = useState(MoveSpeed.Walk);
+  const [moveSpeed, setMoveSpeed] = useState(MoveSpeed.Walk);
 
   const [noRoutesFoundError, setNoRoutesFoundError] = useState(false);
 
@@ -99,10 +99,10 @@ export const Home = (): JSX.Element => {
           origin,
           destination,
           new Date(),
-          runSpeed
+          moveSpeed
         );
 
-        logger.log('newJourney', newJourney, '\nrunSpeed', runSpeed);
+        logger.log('newJourney', newJourney, '\nmoveSpeed', moveSpeed);
 
         setJourney(newJourney);
       } catch (error) {
@@ -119,7 +119,7 @@ export const Home = (): JSX.Element => {
     };
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     updateJourneys();
-  }, [loadedGoogleMapsSdk, origin, destination, handleError, runSpeed]);
+  }, [loadedGoogleMapsSdk, origin, destination, handleError, moveSpeed]);
 
   const setupPlaceChangedListener = (
     inputElementId: InputIds,
@@ -241,12 +241,14 @@ export const Home = (): JSX.Element => {
 
   const ToggleMoveSpeed = (
     <ToggleButtonGroup
-      value={runSpeed}
+      value={moveSpeed}
       color="primary"
       exclusive
-      onChange={(event: React.MouseEvent<HTMLElement>, newSpeed: MoveSpeed) =>
-        setMoveSpeed(newSpeed)
-      }
+      onChange={(event: React.MouseEvent<HTMLElement>, newSpeed: MoveSpeed) => {
+        if (newSpeed) {
+          setMoveSpeed(newSpeed);
+        }
+      }}
       aria-label="MoveSpeed"
     >
       <ToggleButton value={MoveSpeed.Walk} aria-label="walk">
