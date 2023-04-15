@@ -3,25 +3,16 @@ import 'reactjs-popup/dist/index.css';
 import Journey from '../domain/Journey';
 import { MILLISECONDS_PER_MINUTE } from '../services/time.utils';
 import WarningTooltip from './WarningTooltip';
-
-const getBackgroundColour = (minutesSavedComparedToNextJourney: number) => {
-  if (minutesSavedComparedToNextJourney > 10) {
-    return 'bg-green-300';
-  }
-  if (minutesSavedComparedToNextJourney < -10) {
-    return 'bg-red-200';
-  }
-  return 'bg-white';
-};
+import { getDurationBackgroundColour } from './getDurationBackgroundColour';
 
 const journeysWithDeltas = (journeys: Journey[]) =>
   journeys.map((journeyInfo, i) => {
     const nextJourney = journeys[i === journeys.length - 1 ? i : i + 1];
-    const minutesSavedComparedToNextJourney =
+    const minutesSavedVsNextJourney =
       (nextJourney.duration - journeyInfo.duration) / MILLISECONDS_PER_MINUTE;
     return {
       ...journeyInfo,
-      minutesSavedComparedToNextJourney,
+      minutesSavedVsNextJourney,
     };
   });
 
@@ -54,14 +45,15 @@ const JourneysTable: React.VFC<Props> = ({ journeys }: Props) => (
             ({
               departureTime,
               duration,
-              minutesSavedComparedToNextJourney,
+              minutesSavedVsNextJourney,
               transitLines,
               warnings,
             }) => (
               <tr
                 key={departureTime.getTime()}
-                className={`text-gray-600 text-center uppercase text-xs font-semibold tracking-wider ${getBackgroundColour(
-                  minutesSavedComparedToNextJourney
+                className={`text-gray-600 text-center uppercase text-xs font-semibold tracking-wider ${getDurationBackgroundColour(
+                  journeys,
+                  duration
                 )} border-b-2 border-gray-200`}
               >
                 <th className="w-1/4 px-2 py-3 ">
@@ -74,8 +66,14 @@ const JourneysTable: React.VFC<Props> = ({ journeys }: Props) => (
                 <th className="w-1/4 px-2 py-3 ">
                   {Math.round(duration / 60_000)} mins
                 </th>
-                <th className="w-1/4 px-2 py-3 ">
-                  {Math.round(minutesSavedComparedToNextJourney)} mins
+                <th
+                  className={`w-1/4 px-2 py-3 ${
+                    Math.abs(minutesSavedVsNextJourney) < 10
+                      ? 'text-gray-600 text-opacity-50'
+                      : ''
+                  }`}
+                >
+                  {Math.round(minutesSavedVsNextJourney)} mins
                 </th>
 
                 <th className="w-1/4 px-2 py-3 ">
